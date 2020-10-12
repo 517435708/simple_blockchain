@@ -12,4 +12,8 @@ public class BlockMiner {
         return block;
     }
 
+    public Block mineBlock() {
+        //mine Block without providing data;
+        return null;
+    }
 }
