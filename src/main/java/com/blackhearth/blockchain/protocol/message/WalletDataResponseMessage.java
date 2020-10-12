@@ -7,7 +7,7 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.WALLET_
 
 @Setter
 @NoArgsConstructor
-public class WalletDataResponseMessage implements Protocol {
+class WalletDataResponseMessage implements Protocol {
 
     private String amountOfCoins;
     private String publicKey;

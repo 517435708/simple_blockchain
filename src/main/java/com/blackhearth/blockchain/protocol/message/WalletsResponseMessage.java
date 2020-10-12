@@ -12,7 +12,7 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.WALLETS
 
 @Setter
 @NoArgsConstructor
-public class WalletsResponseMessage implements Protocol {
+class WalletsResponseMessage implements Protocol {
 
     private List<String> wallets;
     private String messagePosition;

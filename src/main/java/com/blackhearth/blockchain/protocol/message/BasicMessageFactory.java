@@ -122,7 +122,7 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private List<Protocol> generateWalletsRequestMessage() {
-        return Collections.singletonList(new WalletDataRequestMessage());
+        return Collections.singletonList(new WalletsRequestMessage());
     }
 
     private List<Protocol> generateWalletDataResponseMessage(String address) {
