@@ -2,8 +2,6 @@ package com.blackhearth.blockchain.validation;
 
 import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.BlockChainRepository;
-import com.blackhearth.blockchain.wallet.Transaction;
-import com.blackhearth.blockchain.wallet.Wallet;
 
 import java.util.List;
 
@@ -11,17 +9,7 @@ public class ChainValidator implements Validator {
     private BlockChainRepository repository;
 
     @Override
-    public boolean isTransactionBelong(Transaction transaction, Wallet wallet) {
-        return false;
-    }
-
-    @Override
-    public boolean isProofOfWork(Block block) {
-        return false;
-    }
-
-    @Override
-    public boolean isHashValid(Block block) {
+    public boolean isBlockValid(Block block) {
         int blockPosition = repository.getPositionFromBlockHash(block.getHash()).orElse(0);
         List<Block> blockchain = repository.getBlocksFromPosition(0, blockPosition);
 
@@ -38,23 +26,25 @@ public class ChainValidator implements Validator {
             }
         }
 
+        return !blockchain.isEmpty();
+    }
+
+    @Override
+    public boolean isTransactionValid(TransactionParams params, Block block) {
+        return isEnoughMoney(params) && isAddressToExists(params) && isSignValid();
+    }
+
+    private boolean isEnoughMoney(TransactionParams params) {
+        String coins = repository.getCoinsFromAddress(params.getAddressFrom()).orElse("0");
+        return Integer.parseInt(coins) >= Integer.parseInt(params.getTransactionMoneyAmount());
+    }
+
+    private boolean isAddressToExists(TransactionParams params) {
+        return repository.getPublicKeyFromAddress(params.getAddressTo()).isPresent();
+    }
+
+    private boolean isSignValid() {
+        // TODO: 13.10.2020
         return true;
-    }
-
-    @Override
-    public boolean isLongestNode(Block block) {
-
-        return false;
-    }
-
-    @Override
-    public boolean isTransactionAllowed(Block block, Transaction transaction) {
-        // TODO: 12.10.2020 to samo co wyżej. Kto to wie czy to jest okej :|
-        String coinsFromAddress = repository.getCoinsFromAddress(transaction.getAddress()).orElse("0");
-
-        int accountCoins = Integer.parseInt(coinsFromAddress);
-        int transactionAmount = Integer.parseInt(transaction.getAmount());
-
-        return (accountCoins - transactionAmount) > 0;
     }
 }
