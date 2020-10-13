@@ -3,18 +3,48 @@ package com.blackhearth.blockchain.validation;
 import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.BlockChainRepository;
 import com.blackhearth.blockchain.wallet.Transaction;
+import com.blackhearth.blockchain.wallet.Wallet;
+
+import java.util.List;
 
 public class ChainValidator implements Validator {
     private BlockChainRepository repository;
 
     @Override
-    public boolean isHashValid(Block block) {
-        // TODO: 12.10.2020 zweryfikuj czy aby na pewno to ma sens
-        // bo to jest obliczone 2 razy w tym samym obiekcie :(
-        String blockHash = block.getHash();
-        String calculatedHash = block.calculateBlockHash();
+    public boolean isTransactionBelong(Transaction transaction, Wallet wallet) {
+        return false;
+    }
 
-        return blockHash.equals(calculatedHash);
+    @Override
+    public boolean isProofOfWork(Block block) {
+        return false;
+    }
+
+    @Override
+    public boolean isHashValid(Block block) {
+        int blockPosition = repository.getPositionFromBlockHash(block.getHash()).orElse(0);
+        List<Block> blockchain = repository.getBlocksFromPosition(0, blockPosition);
+
+        for (int i = 1; i < blockchain.size(); i++) {
+            Block currentBlock = blockchain.get(i);
+            Block previousBlock = blockchain.get(i - 1);
+
+            if (!currentBlock.getHash().equals(currentBlock.calculateBlockHash())) {
+                return false;
+            }
+
+            if (!previousBlock.getHash().equals(currentBlock.getPreviousHash())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean isLongestNode(Block block) {
+
+        return false;
     }
 
     @Override
