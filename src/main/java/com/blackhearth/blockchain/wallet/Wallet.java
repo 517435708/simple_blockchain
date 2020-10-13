@@ -1,8 +1,9 @@
 package com.blackhearth.blockchain.wallet;
 
+import com.blackhearth.blockchain.wallet.signature.SignatureGenerator;
+import com.blackhearth.blockchain.wallet.transactions.Transaction;
 import lombok.Data;
 
-import javax.crypto.Cipher;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -15,11 +16,11 @@ public class Wallet {
 
     private Transaction lastTransaction;
 
-    public void prepareTransaction(String amount, String address) {
+    public void prepareTransaction(Long amount, String address) {
         lastTransaction = new Transaction();
         lastTransaction.setAddress(address);
         lastTransaction.setAmount(amount);
-        //TODO lastTransaction.setSign();
+        lastTransaction.setSignature(SignatureGenerator.applySignature(privateKey, hash));
     }
 
     public Wallet() {
@@ -37,5 +38,7 @@ public class Wallet {
         }
 
     }
+
+
 
 }
