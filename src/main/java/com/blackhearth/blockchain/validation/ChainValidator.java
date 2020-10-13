@@ -45,6 +45,7 @@ public class ChainValidator implements Validator {
 
     private boolean isSignValid() {
         // TODO: 13.10.2020
+        //  SignatureGenerator.validateSign
         return true;
     }
 }
