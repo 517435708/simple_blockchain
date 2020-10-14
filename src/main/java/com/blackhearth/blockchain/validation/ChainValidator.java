@@ -51,7 +51,7 @@ public class ChainValidator implements Validator {
             }
         }
 
-        return !blockchain.isEmpty() && isProofOfWork(block);
+        return !blockchain.isEmpty();
     }
 
     private boolean isProofOfWork(Block block) {
