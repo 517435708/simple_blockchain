@@ -8,11 +8,12 @@ import java.util.List;
 
 @AllArgsConstructor
 public class ChainValidator implements Validator {
+    private static final String HASH_STARTS_WITH = "000001";
     private BlockChainRepository repository;
 
     @Override
     public boolean isBlockValid(Block block) {
-        return isHashesValid(block) && isProofOfWork();
+        return isHashesValid(block) && isProofOfWork(block);
     }
 
     @Override
@@ -30,9 +31,7 @@ public class ChainValidator implements Validator {
     }
 
     private boolean isSignValid() {
-        // TODO: 13.10.2020
-        //  SignatureGenerator.validateSign z brancha Błażeja
-        return true;
+        throw new UnsupportedOperationException("Uzupełnić przez SignatureGenerator.validateSign() z brancha Błażeja po zmergowaniu");
     }
 
     private boolean isHashesValid(Block block) {
@@ -52,12 +51,18 @@ public class ChainValidator implements Validator {
             }
         }
 
-        return !blockchain.isEmpty();
+        return !blockchain.isEmpty() && isProofOfWork(block);
     }
 
-    private boolean isProofOfWork() {
-        // TODO: 13.10.2020 czy my to w ogóle musimy robić?
-        return true;
+    private boolean isProofOfWork(Block block) {
+        return containsFiveZerosAtStart(block.getHash()) && isHashEqualsWithCalculated(block);
     }
 
+    private boolean containsFiveZerosAtStart(String hash) {
+        return hash.startsWith(HASH_STARTS_WITH);
+    }
+
+    private boolean isHashEqualsWithCalculated(Block block) {
+        return block.getHash().equals(block.calculateBlockHash());
+    }
 }
