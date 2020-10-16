@@ -20,7 +20,7 @@ public class Transaction {
     private Long amount; //Contains the amount we wish to send to the recipient.
 
     @Setter(AccessLevel.NONE)
-    private String signature;
+    private byte[] signature;
 
     public Transaction(PublicKey from, PublicKey to, Long amount) {
         this.sender = from;
@@ -30,10 +30,13 @@ public class Transaction {
 
     public void addSignature(PrivateKey privateKey) {
         if (address != null && sender != null && reciepient != null && amount > 0L) {
-            String transactionContent = SignatureUtils.getStringFromKey(sender) +
-                    SignatureUtils.getStringFromKey(reciepient) +
-                    address + amount.toString();
-            this.signature = SignatureGenerator.applySignature(privateKey, transactionContent);
+            this.signature = SignatureGenerator.applySignature(privateKey, getTransactionData());
         }
+    }
+
+    public String getTransactionData() {
+        return SignatureUtils.getStringFromKey(sender) +
+                SignatureUtils.getStringFromKey(reciepient) +
+                address + amount.toString();
     }
 }

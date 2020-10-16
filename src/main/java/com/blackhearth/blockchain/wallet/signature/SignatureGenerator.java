@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class SignatureGenerator {
 
-    public static String applySignature(PrivateKey privateKey, String input) {
+    public static byte[] applySignature(PrivateKey privateKey, String input) {
         byte[] output = new byte[0];
 
         try {
@@ -18,6 +18,6 @@ public class SignatureGenerator {
             e.printStackTrace();
         }
 
-        return Arrays.toString(output);
+        return output;
     }
 }

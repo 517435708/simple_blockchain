@@ -32,8 +32,14 @@ public class Wallet {
         generateKeyPair();
         final String uuid = UUID.randomUUID().toString().replace("-", "");
         this.walletData = new WalletData(publicKey, uuid);
-        this.setHash(SignatureUtils.applySha256(
-                SignatureUtils.getStringFromKey(publicKey) + uuid + lastTransaction.getAddress()));
+        if(lastTransaction != null) {
+            this.setHash(SignatureUtils.applySha256(
+                    SignatureUtils.getStringFromKey(publicKey) + uuid + lastTransaction.getAddress()));
+        } else {
+            this.setHash(SignatureUtils.applySha256(
+                    SignatureUtils.getStringFromKey(publicKey) + uuid));
+        }
+
     }
 
     public void generateKeyPair() {
