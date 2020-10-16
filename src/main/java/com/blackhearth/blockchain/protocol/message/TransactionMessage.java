@@ -12,10 +12,10 @@ class TransactionMessage implements Protocol {
     private String senderAddress;
     private String receiverAddress;
     private Long amountOfCoinTransferred;
-    private String digitalSignature;
+    private byte[] digitalSignature;
 
     @Override
     public String generateMessage() {
-        return TRANSACTION.getCode() + senderAddress + "|" + receiverAddress + "|" + amountOfCoinTransferred + "|" + digitalSignature;
+        return TRANSACTION.getCode() + senderAddress + "|" + receiverAddress + "|" + amountOfCoinTransferred + "|" + digitalSignature.toString();
     }
 }
