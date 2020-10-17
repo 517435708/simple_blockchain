@@ -1,12 +1,12 @@
 package com.blackhearth.blockchain.wallet.signature;
 
-
 import java.security.*;
-import java.util.Arrays;
+import java.util.Base64;
+
 
 public class SignatureGenerator {
 
-    public static byte[] applySignature(PrivateKey privateKey, String input) {
+    public static String applySignature(PrivateKey privateKey, String input) {
         byte[] output = new byte[0];
 
         try {
@@ -18,6 +18,6 @@ public class SignatureGenerator {
             e.printStackTrace();
         }
 
-        return output;
+        return Base64.getEncoder().encodeToString(output);
     }
 }
