@@ -11,4 +11,5 @@ public class TransactionParams {
     private String addressFrom;
     private String addressTo;
     private String transactionMoneyAmount;
+    private String digitalSign;
 }

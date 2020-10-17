@@ -17,8 +17,13 @@ public class ChainValidator implements Validator {
     }
 
     @Override
-    public boolean isTransactionValid(TransactionParams params, Block block) {
+    public boolean isTransactionValid(TransactionParams params) {
         return isEnoughMoney(params) && isAddressToExists(params) && isSignValid();
+    }
+
+    @Override
+    public boolean isWalletValid(String hash, String publicKey) {
+        return false; //TODO
     }
 
     private boolean isEnoughMoney(TransactionParams params) {

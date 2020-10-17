@@ -16,4 +16,5 @@ public interface BlockChainRepository {
     List<WalletData> getWalletsFromPosition(int position, int wallets);
 
     List<BlockChainNodeData> getNodesFromPosition(int position, int increment);
+    void addToBlockChain(Block block);
 }
