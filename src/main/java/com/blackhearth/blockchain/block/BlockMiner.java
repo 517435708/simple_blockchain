@@ -1,5 +1,8 @@
 package com.blackhearth.blockchain.block;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class BlockMiner {
 
     public Block mineBlock(String data, String previousHash, long timeStamp, int prefix) {

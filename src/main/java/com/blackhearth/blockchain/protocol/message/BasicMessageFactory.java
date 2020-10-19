@@ -10,6 +10,7 @@ import com.blackhearth.blockchain.wallet.Transaction;
 import com.blackhearth.blockchain.wallet.Wallet;
 import com.blackhearth.blockchain.wallet.WalletData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,7 +26,9 @@ public class BasicMessageFactory implements MessageFactory {
     private final BlockMiner blockMiner;
     private final BlockChainNode blockChainNode;
     private final BlockChainRepository blockChainRepository;
-    private final Wallet wallet;
+
+    // TODO: 18.10.2020 do sth
+    private final Wallet wallet = new Wallet();
 
     @Override
     public List<Protocol> generateMessages(ProtocolHeader header, String walletAddress) throws
