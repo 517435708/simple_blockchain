@@ -6,11 +6,13 @@ import com.blackhearth.blockchain.block.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
+import com.blackhearth.blockchain.peertopeer.PeerToPeerService;
 import com.blackhearth.blockchain.protocol.message.MessageFactory;
 import com.blackhearth.blockchain.protocol.message.Protocol;
 import com.blackhearth.blockchain.protocol.message.ProtocolHeader;
 import com.blackhearth.blockchain.validation.TransactionParams;
 import com.blackhearth.blockchain.validation.Validator;
+import com.blackhearth.blockchain.wallet.WalletData;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.*;
 
@@ -32,85 +36,130 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     private final BlockBuilder blockBuilder;
     private final MessageFactory messageFactory;
 
+    private final PeerToPeerService peerToPeerService;
+
     @Override
-    public Optional<String> interpretMessage(String message) {
+    public void interpretMessage(String message, String senderAddress, String senderPort) {
         Optional<ProtocolHeader> optionalProtocolHeader = ProtocolHeader.getFromCode(message.substring(0, 2));
-        return optionalProtocolHeader.map(protocolHeader -> proceed(protocolHeader, message.substring(2)));
+        optionalProtocolHeader.ifPresent(protocolHeader -> proceed(protocolHeader,
+                                                                   message.substring(2),
+                                                                   senderAddress,
+                                                                   senderPort));
     }
 
-    private String proceed(ProtocolHeader protocolHeader, String value) {
+    private void proceed(ProtocolHeader protocolHeader, String value, String address, String port) {
         switch (protocolHeader) {
-            case NOTIFY_NODE: return notifyNode(value);
-            case NOTIFY_WALLET: return notifyWallet(value);
-            case ADD_BLOCK: return addBlock(value);
-            case TRANSACTION: return transaction(value);
-            case WALLET_DATA_REQUEST: return walletDataRequest(value);
-            case WALLET_DATA_RESPONSE: return walletDataResponse(value);
-            case WALLETS_REQUEST: return walletsRequest(value);
-            case WALLETS_RESPONSE: return walletsResponse(value);
-            case NODES_REQUEST: return nodesRequest(value);
-            case NODES_RESPONSE: return nodesResponse(value);
-            default: return null;
+            case NOTIFY_NODE:
+                notifyNode(value);
+                break;
+            case NOTIFY_WALLET:
+                notifyWallet(value);
+                break;
+            case ADD_BLOCK:
+                addBlock(value);
+                break;
+            case TRANSACTION:
+                transaction(value);
+                break;
+            case WALLET_DATA_REQUEST:
+                walletDataRequest(value, address, port);
+                break;
+            case WALLET_DATA_RESPONSE:
+                walletDataResponse(value);
+                break;
+            case WALLETS_REQUEST:
+                walletsRequest(address, port);
+                break;
+            case WALLETS_RESPONSE:
+                walletsResponse(value);
+                break;
+            case NODES_REQUEST:
+                nodesRequest(address, port);
+                break;
+            case NODES_RESPONSE:
+                nodesResponse(value);
+                break;
+            default:
+                break;
         }
     }
 
-    private String nodesResponse(String value) {
-        return null;
+    private void nodesResponse(String value) {
+        BlockChainNodeData[] nodes = new Gson().fromJson(value, BlockChainNodeData[].class);
+        for (var node : nodes) {
+            peerToPeerRepository.saveNode(node);
+        }
     }
 
-    private String nodesRequest(String value) {
-        return null;
-    }
-
-    private String walletsResponse(String value) {
-        return null;
-    }
-
-    private String walletsRequest(String value) {
-        return null;
-    }
-
-    private String walletDataResponse(String value) {
-        return null;
-    }
-
-    private String walletDataRequest(String value) {
+    private void nodesRequest(String address, String port) {
         try {
-            List<Protocol> protocol = messageFactory.generateMessages(WALLET_DATA_RESPONSE, value);
-            return protocol.stream().findFirst().orElseThrow(() -> new BlockChainNodeException("No protocol found")).generateMessage();
+            Protocol protocol = messageFactory.generateMessages(NODES_RESPONSE);
+            peerToPeerService.sendMessageTo(protocol.generateMessage(), address, port);
+        } catch (BlockChainNodeException e) {
+            log.error(String.valueOf(e));
+        }
+    }
+
+    private void walletsResponse(String value) {
+        String[] wallets = value.split("\\|");
+        List<WalletData> walletsData = Stream.of(wallets)
+                                             .map(string -> new Gson().fromJson(string, WalletData.class))
+                                             .collect(Collectors.toList());
+        for (var wallet : walletsData) {
+            peerToPeerRepository.saveWalletData(wallet);
+        }
+    }
+
+    private void walletsRequest(String address, String port) {
+        try {
+            Protocol protocol = messageFactory.generateMessages(WALLETS_RESPONSE);
+            peerToPeerService.sendMessageTo(protocol.generateMessage(), address, port);
+        } catch (BlockChainNodeException e) {
+            log.error(String.valueOf(e));
+        }
+    }
+
+    private void walletDataResponse(String value) {
+        String[] args = value.split("\\|");
+        WalletData walletData = new WalletData();
+        walletData.setAmountOfMoney(args[0]);
+        walletData.setPublicKey(args[1]);
+        walletData.setAddress(args[2]);
+        peerToPeerRepository.saveWalletData(walletData);
+    }
+
+    private void walletDataRequest(String walletAddress, String address, String port) {
+        try {
+            Protocol protocol = messageFactory.generateMessages(WALLET_DATA_RESPONSE, walletAddress);
+            peerToPeerService.sendMessageTo(protocol.generateMessage(), address, port);
         } catch (BlockChainNodeException ex) {
             log.error(String.valueOf(ex));
-            return null;
         }
     }
 
-    private String transaction(String value) {
+    private void transaction(String value) {
         String[] args = value.split("\\|");
         TransactionParams transactionParams = new TransactionParams(args[0], args[1], args[2], args[3]);
         if (validator.isTransactionValid(transactionParams)) {
             blockBuilder.addDataToNextBlock(TRANSACTION.getCode() + value);
         }
-        return null;
     }
 
-    private String addBlock(String value) {
+    private void addBlock(String value) {
         Block block = new Gson().fromJson(value, Block.class);
         if (validator.isBlockValid(block)) {
             blockChainRepository.addToBlockChain(block);
         }
-        return null;
     }
 
-    private String notifyWallet(String value) {
+    private void notifyWallet(String value) {
         String[] values = value.split("HASH:");
         if (validator.isWalletValid(values[1], values[0])) {
             blockBuilder.addDataToNextBlock(NOTIFY_WALLET.getCode() + value);
         }
-        return null;
     }
 
-    private String notifyNode(String value) {
+    private void notifyNode(String value) {
         peerToPeerRepository.saveNode(new Gson().fromJson(value, BlockChainNodeData.class));
-        return null;
     }
 }

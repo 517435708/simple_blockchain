@@ -11,18 +11,15 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.NODES_R
 
 @Setter
 @NoArgsConstructor
-class NodesResponseMessage implements Protocol{
+class NodesResponseMessage implements Protocol {
 
     private List<BlockChainNodeData> nodes;
-    private String messagePosition;
 
     @Override
     public String generateMessage() {
         StringBuilder message = new StringBuilder(NODES_RESPONSE.getCode());
         Gson gson = new Gson();
-        for (var node : nodes) {
-            message.append(gson.toJson(node));
-        }
-        return message.append(messagePosition).toString();
-    }
+        message.append(gson.toJson(nodes));
+        return message.toString();
+}
 }

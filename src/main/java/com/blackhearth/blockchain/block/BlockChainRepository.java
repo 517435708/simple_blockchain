@@ -2,7 +2,6 @@ package com.blackhearth.blockchain.block;
 
 
 import com.blackhearth.blockchain.node.BlockChainNodeData;
-import com.blackhearth.blockchain.wallet.Wallet;
 import com.blackhearth.blockchain.wallet.WalletData;
 
 import java.util.List;
@@ -13,8 +12,8 @@ public interface BlockChainRepository {
     List<Block> getBlocksFromPosition(int position, int blocks);
     Optional<Integer> getPositionFromBlockHash(String hash);
     Optional<String> getPublicKeyFromAddress(String address);
-    List<WalletData> getWalletsFromPosition(int position, int wallets);
+    List<WalletData> getWallets();
 
-    List<BlockChainNodeData> getNodesFromPosition(int position, int increment);
+    List<BlockChainNodeData> getNodes();
     void addToBlockChain(Block block);
 }

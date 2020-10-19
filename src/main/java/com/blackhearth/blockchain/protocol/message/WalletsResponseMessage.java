@@ -1,12 +1,10 @@
 package com.blackhearth.blockchain.protocol.message;
 
-import com.blackhearth.blockchain.wallet.WalletData;
-import lombok.AllArgsConstructor;
+import com.google.gson.Gson;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.WALLETS_RESPONSE;
 
@@ -15,14 +13,16 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.WALLETS
 class WalletsResponseMessage implements Protocol {
 
     private List<String> wallets;
-    private String messagePosition;
 
     @Override
     public String generateMessage() {
         StringBuilder message = new StringBuilder(WALLETS_RESPONSE.getCode());
-        for (var wallet : wallets) {
-            message.append(wallet).append("|");
+        for (int i = 0; i < wallets.size(); i++) {
+            message.append(new Gson().toJson(wallets.get(i)));
+            if (i != wallets.size() - 1) {
+                message.append("|");
+            }
         }
-        return message.append(messagePosition).toString();
+        return message.toString();
     }
 }

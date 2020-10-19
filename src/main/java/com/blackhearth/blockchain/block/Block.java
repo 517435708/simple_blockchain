@@ -2,6 +2,7 @@ package com.blackhearth.blockchain.block;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.security.KeyPairGenerator;
@@ -10,6 +11,7 @@ import java.security.MessageDigest;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Data
+@NoArgsConstructor
 public class Block {
     private String hash;
     private String previousHash;
