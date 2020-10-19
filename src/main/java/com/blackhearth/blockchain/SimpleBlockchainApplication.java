@@ -1,5 +1,8 @@
-package com.blackhearth.blockchain.startup;
+package com.blackhearth.blockchain;
 
+import com.blackhearth.blockchain.p2p.TcpClient;
+import com.blackhearth.blockchain.startup.ParamsReader;
+import com.blackhearth.blockchain.startup.RunParams;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,10 +13,8 @@ public class SimpleBlockchainApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SimpleBlockchainApplication.class, args);
-		Map<RunParams, Object> params = new RunnerImpl().getParams(args);
+		Map<RunParams, Object> params = ParamsReader.getParams(args);
 
-		String xd = (String) params.get(RunParams.FIRST_KNOWN);
-		System.out.println(xd);
+		new TcpClient().start();
 	}
-
 }

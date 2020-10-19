@@ -1,17 +1,18 @@
 package com.blackhearth.blockchain.startup;
 
-import javafx.util.Pair;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
-public class RunnerImpl implements Runner {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class ParamsReader {
 
-    @Override
-    public Map<RunParams, Object> getParams(String[] args) {
-        Map<RunParams, Object> paramsMap = new HashMap<>();
+    public static Map<RunParams, Object> getParams(String[] args) {
+        Map<RunParams, Object> paramsMap = new EnumMap<>(RunParams.class);
 
         for (int i = 0; i < args.length; i++) {
             RunParams runParams = RunParams.getByValue(args[i]);
@@ -22,7 +23,7 @@ public class RunnerImpl implements Runner {
     }
 
     @SneakyThrows
-    private void manageArg(RunParams param, String[] args, int i, Map<RunParams, Object> map) {
+    private static void manageArg(RunParams param, String[] args, int i, Map<RunParams, Object> map) {
         Class<?> paramService = param.getParamService();
         Constructor<?> declaredConstructor = paramService.getDeclaredConstructor();
         ParamService o = (ParamService) declaredConstructor.newInstance();
