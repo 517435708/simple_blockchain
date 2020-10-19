@@ -17,6 +17,7 @@ public class Wallet {
     private WalletData walletData;
     private Transaction lastTransaction;
     private String hash;
+    private String password;
 
 
     public void prepareTransaction(long amount, PublicKey recipientKey) throws TransactionExeption {
@@ -28,30 +29,18 @@ public class Wallet {
         lastTransaction.addSignature(this.privateKey);
     }
 
-    public Wallet() {
-        generateKeyPair();
-        final String uuid = UUID.randomUUID().toString().replace("-", "");
-        this.walletData = new WalletData(publicKey, uuid);
-        hashSetter(uuid);
+    // password with SHA1 encryption
+    public void setWalletData(String password){
+        this.walletData = new WalletData(publicKey, password);
     }
 
-    private void hashSetter(String uuid) {
+    public void setHash(String password) {
         if (lastTransaction != null) {
             this.setHash(SignatureUtils.applySha256(
-                    SignatureUtils.getStringFromKey(publicKey) + uuid + lastTransaction.getAddress()));
+                    SignatureUtils.getStringFromKey(publicKey) + password + lastTransaction.getAddress()));
         } else {
             this.setHash(SignatureUtils.applySha256(
-                    SignatureUtils.getStringFromKey(publicKey) + uuid));
-        }
-    }
-
-    public void generateKeyPair() {
-        try {
-            KeysGenerator keysGenerator = new KeysGenerator(512);
-            privateKey = keysGenerator.getPrivateKey();
-            publicKey = keysGenerator.getPublicKey();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+                    SignatureUtils.getStringFromKey(publicKey) + password));
         }
     }
 }

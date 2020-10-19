@@ -9,8 +9,8 @@ import java.security.PublicKey;
 public class WalletData {
     private String address;
 
-    public WalletData(PublicKey publicKey, String uuid) {
+    public WalletData(PublicKey publicKey, String password) {
         this.address = SignatureUtils.applySha256(
-                SignatureUtils.getStringFromKey(publicKey) + uuid);
+                SignatureUtils.getStringFromKey(publicKey) + password);
     }
 }

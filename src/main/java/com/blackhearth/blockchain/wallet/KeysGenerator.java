@@ -16,7 +16,7 @@ public class KeysGenerator {
     }
 
     private void createKeys() {
-        KeyPair pair = this.keyGen.generateKeyPair();
+        KeyPair pair = keyGen.generateKeyPair();
         this.privateKey = pair.getPrivate();
         this.publicKey = pair.getPublic();
     }
