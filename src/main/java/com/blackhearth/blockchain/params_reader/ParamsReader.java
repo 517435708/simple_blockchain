@@ -1,4 +1,4 @@
-package com.blackhearth.blockchain.startup;
+package com.blackhearth.blockchain.params_reader;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
