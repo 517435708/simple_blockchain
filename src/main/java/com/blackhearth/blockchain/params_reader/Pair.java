@@ -3,11 +3,9 @@ package com.blackhearth.blockchain.params_reader;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.io.Serializable;
-
 @AllArgsConstructor
 @Data
-public class Pair<K, V> implements Serializable {
+public class Pair<K, V> {
     private K key;
     private V value;
 }

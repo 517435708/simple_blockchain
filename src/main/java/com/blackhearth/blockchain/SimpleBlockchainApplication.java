@@ -23,6 +23,4 @@ public class SimpleBlockchainApplication {
 
 		System.out.println(basicPeerToPeerService.getLocalNodeChainData());
 	}
-
-
 }
