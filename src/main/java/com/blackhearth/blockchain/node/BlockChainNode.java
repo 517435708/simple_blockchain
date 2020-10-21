@@ -14,8 +14,8 @@ import java.util.Random;
 @Component
 @RequiredArgsConstructor
 public class BlockChainNode {
-    // TODO: 18.10.2020 do sth
-    private final Random random = new Random();
+
+    private final Random random;
 
     private boolean isNodeRunning = false;
     @Getter

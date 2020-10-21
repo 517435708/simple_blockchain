@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class BlockChainRepositoryImpl implements BlockChainRepository {
+public class BasicBlockChainRepository implements BlockChainRepository {
     @Override
     public Optional<String> getCoinsFromAddress(String walletAddress) {
         return Optional.empty();

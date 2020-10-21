@@ -26,9 +26,7 @@ public class BasicMessageFactory implements MessageFactory {
     private final BlockMiner blockMiner;
     private final BlockChainNode blockChainNode;
     private final BlockChainRepository blockChainRepository;
-
-    // TODO: 18.10.2020 do sth
-    private final Wallet wallet = new Wallet();
+    private final Wallet wallet;
 
     @Override
     public List<Protocol> generateMessages(ProtocolHeader header, String walletAddress) throws
