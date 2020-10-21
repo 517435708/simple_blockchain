@@ -36,6 +36,7 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
+	testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.1'
 }
 
 dependencyManagement {
