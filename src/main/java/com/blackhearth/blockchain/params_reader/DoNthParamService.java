@@ -1,7 +1,5 @@
 package com.blackhearth.blockchain.params_reader;
 
-import javafx.util.Pair;
-
 public class DoNthParamService implements ParamService {
 
     @Override

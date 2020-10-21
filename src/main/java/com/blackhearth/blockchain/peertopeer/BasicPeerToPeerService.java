@@ -1,5 +1,6 @@
 package com.blackhearth.blockchain.peertopeer;
 
+import com.blackhearth.blockchain.node.BlockChainNodeData;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,5 +31,11 @@ public class BasicPeerToPeerService implements PeerToPeerService {
     @Override
     public void sendMessageToAllKnownNodes(String message) {
         // TODO: 21.10.2020
+    }
+
+    @Override
+    public BlockChainNodeData getNodeChainData() {
+        // TODO: 21.10.2020  
+        return null;
     }
 }
