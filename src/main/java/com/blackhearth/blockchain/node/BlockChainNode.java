@@ -1,8 +1,11 @@
 package com.blackhearth.blockchain.node;
 
+import com.blackhearth.blockchain.peertopeer.BasicPeerToPeerService;
+import com.blackhearth.blockchain.peertopeer.PeerToPeerService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -14,18 +17,18 @@ import java.util.Random;
 @Component
 @RequiredArgsConstructor
 public class BlockChainNode {
-
     private final Random random;
 
     private boolean isNodeRunning = false;
     @Getter
     private ServerSocket socket;
 
+    @Autowired
+    private PeerToPeerService p2pService;
     private int port;
 
-
     public BlockChainNodeData start() throws
-                                  BlockChainNodeException {
+            BlockChainNodeException, IOException {
         if (!isNodeRunning) {
             socket = openSocket();
             runNode();
@@ -38,7 +41,8 @@ public class BlockChainNode {
         return new BlockChainNodeData(port, socket.getInetAddress().toString());
     }
 
-    private void runNode() {
+    private void runNode() throws IOException {
+        p2pService.start(port);
         //stuff
     }
 
@@ -54,7 +58,7 @@ public class BlockChainNode {
             } catch (IOException e) {
                 tryNumber++;
                 e.printStackTrace();
-                log.error("Couldn't create server socket, trying again [" + tryNumber + "] cause: " + e.getMessage());
+                log.error("Couldn't create server socket, trying again [{}] cause: {}", tryNumber, e.getMessage());
             }
         } while (tryNumber > 10);
         throw new BlockChainNodeException("Failed to Create server socket");

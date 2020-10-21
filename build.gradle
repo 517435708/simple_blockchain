@@ -37,6 +37,7 @@ dependencies {
 	}
 	testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-stub-runner'
 	testCompile group: 'org.assertj', name: 'assertj-core', version: '3.6.1'
+	compile group: 'com.esotericsoftware', name: 'kryonet', version: '2.22.0-RC1'
 }
 
 dependencyManagement {

@@ -1,5 +1,6 @@
 package com.blackhearth.blockchain.p2ptests;
 
+import com.blackhearth.blockchain.peertopeer.CommunicationObject;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -18,12 +19,12 @@ public class BasicServer {
         server.bind(54555);
 
         Kryo kryo = server.getKryo();
-        kryo.register(Response.class);
+        kryo.register(CommunicationObject.class);
 
         server.addListener(new Listener() {
             public void received (Connection connection, Object object) {
-                if (object instanceof Response) {
-                    Response request = (Response)object;
+                if (object instanceof CommunicationObject) {
+                    CommunicationObject request = (CommunicationObject)object;
                     System.out.println(request.getText());
 
                     Object[] objects = Stream.of(server.getConnections())
