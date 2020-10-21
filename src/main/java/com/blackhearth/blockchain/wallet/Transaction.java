@@ -7,4 +7,5 @@ public class Transaction {
     private String address;
     private String amount;
     private String sign;
+    private long timeStamp;
 }
