@@ -1,7 +1,7 @@
 package com.blackhearth.blockchain.protocol.message;
 
 import com.blackhearth.blockchain.block.Block;
-import com.blackhearth.blockchain.block.BlockChainRepository;
+import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.block.BlockMiner;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
@@ -93,8 +93,7 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateWalletsResponseMessage() {
-        List<WalletData> data;
-        data = blockChainRepository.getWallets();
+        List<WalletData> data = blockChainRepository.getWallets();
         WalletsResponseMessage walletsResponseMessage = new WalletsResponseMessage();
         walletsResponseMessage.setWallets(data.stream()
                                               .map(WalletData::getAddress)
@@ -130,6 +129,7 @@ public class BasicMessageFactory implements MessageFactory {
         transactionMessage.setAmountOfCoinTransferred(transaction.getAmount());
         transactionMessage.setReceiverAddress(transaction.getAddress());
         transactionMessage.setDigitalSignature(transaction.getSign());
+        transactionMessage.setTimeStamp(transaction.getTimeStamp());
         return transactionMessage;
     }
 

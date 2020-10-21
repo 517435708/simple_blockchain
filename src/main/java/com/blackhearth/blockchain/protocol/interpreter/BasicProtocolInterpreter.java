@@ -2,7 +2,7 @@ package com.blackhearth.blockchain.protocol.interpreter;
 
 import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.BlockBuilder;
-import com.blackhearth.blockchain.block.BlockChainRepository;
+import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
@@ -18,10 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.*;
 
@@ -102,12 +99,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     private void walletsResponse(String value) {
         String[] wallets = value.split("\\|");
-        List<WalletData> walletsData = Stream.of(wallets)
-                                             .map(string -> new Gson().fromJson(string, WalletData.class))
-                                             .collect(Collectors.toList());
-        for (var wallet : walletsData) {
-            peerToPeerRepository.saveWalletData(wallet);
-        }
+        peerToPeerRepository.saveWalletsAddresses(wallets);
     }
 
     private void walletsRequest(String address, String port) {
@@ -125,7 +117,9 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
         walletData.setAmountOfMoney(args[0]);
         walletData.setPublicKey(args[1]);
         walletData.setAddress(args[2]);
-        peerToPeerRepository.saveWalletData(walletData);
+        if (!(args[0].equals("") || args[1].equals("") || args[2].equals(""))) {
+            peerToPeerRepository.saveWalletData(walletData);
+        }
     }
 
     private void walletDataRequest(String walletAddress, String address, String port) {
@@ -139,7 +133,11 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     private void transaction(String value) {
         String[] args = value.split("\\|");
-        TransactionParams transactionParams = new TransactionParams(args[0], args[1], args[2], args[3]);
+        TransactionParams transactionParams = new TransactionParams(args[0],
+                                                                    args[1],
+                                                                    args[2],
+                                                                    args[3],
+                                                                    Long.parseLong(args[4]));
         if (validator.isTransactionValid(transactionParams)) {
             blockBuilder.addDataToNextBlock(TRANSACTION.getCode() + value);
         }

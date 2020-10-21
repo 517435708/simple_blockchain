@@ -9,4 +9,5 @@ public interface PeerToPeerRepository {
     List<BlockChainNodeData> getNodes();
     void saveNode(BlockChainNodeData data);
     void saveWalletData(WalletData walletData);
+    void saveWalletsAddresses(String[] addresses);
 }

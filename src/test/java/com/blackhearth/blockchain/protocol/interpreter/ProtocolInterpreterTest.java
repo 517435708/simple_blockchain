@@ -2,7 +2,7 @@ package com.blackhearth.blockchain.protocol.interpreter;
 
 import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.BlockBuilder;
-import com.blackhearth.blockchain.block.BlockChainRepository;
+import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
@@ -11,27 +11,31 @@ import com.blackhearth.blockchain.protocol.message.MessageFactory;
 import com.blackhearth.blockchain.protocol.message.Protocol;
 import com.blackhearth.blockchain.validation.TransactionParams;
 import com.blackhearth.blockchain.validation.Validator;
+import com.blackhearth.blockchain.wallet.WalletData;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.*;
 
 class ProtocolInterpreterTest {
 
-    private ProtocolInterpreter protocolInterpreter;
-    private BlockChainRepository blockChainRepository;
-    private PeerToPeerRepository peerToPeerRepository;
-    private Validator validator;
-    private BlockBuilder blockBuilder;
-    private MessageFactory messageFactory;
-    private PeerToPeerService peerToPeerService;
+    private static ProtocolInterpreter protocolInterpreter;
+    private static BlockChainRepository blockChainRepository;
+    private static PeerToPeerRepository peerToPeerRepository;
+    private static Validator validator;
+    private static BlockBuilder blockBuilder;
+    private static MessageFactory messageFactory;
+    private static PeerToPeerService peerToPeerService;
 
 
     @BeforeAll
-    public void init() {
+    public static void init() {
 
         blockChainRepository = Mockito.mock(BlockChainRepository.class);
         peerToPeerRepository = Mockito.mock(PeerToPeerRepository.class);
@@ -50,34 +54,134 @@ class ProtocolInterpreterTest {
 
     @AfterEach
     public void reset() {
-        Mockito.reset(blockChainRepository, peerToPeerRepository, validator, blockBuilder, messageFactory, peerToPeerService);
+        Mockito.reset(blockChainRepository,
+                      peerToPeerRepository,
+                      validator,
+                      blockBuilder,
+                      messageFactory,
+                      peerToPeerService);
     }
-
 
 
     @Test
     void nodesResponse() {
+        //given
+        BlockChainNodeData node1 = new BlockChainNodeData(1337, "124.120.120.1");
+        BlockChainNodeData node2 = new BlockChainNodeData(2337, "126.120.120.1");
+        List<BlockChainNodeData> nodes = Arrays.asList(node1, node2);
 
+        String message = NODES_RESPONSE.getCode() + new Gson().toJson(nodes);
+        String senderAddress = "192.168.1.1";
+        String senderPort = "2137";
+
+        //when
+        protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
+
+        //then
+        Mockito.verify(peerToPeerRepository, Mockito.times(1))
+               .saveNode(node1);
+        Mockito.verify(peerToPeerRepository, Mockito.times(1))
+               .saveNode(node2);
     }
 
     @Test
     void nodesRequest() {
+        //given
+        Protocol protocol = () -> "Mock";
 
+        String message = NODES_REQUEST.getCode();
+        String senderAddress = "192.168.1.1";
+        String senderPort = "2137";
+
+        //when
+        try {
+            Mockito.when(messageFactory.generateMessages(NODES_RESPONSE))
+                   .thenReturn(protocol);
+        } catch (BlockChainNodeException e) {
+            e.printStackTrace();
+        }
+        protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
+
+        //then
+        Mockito.verify(peerToPeerService, Mockito.times(1))
+               .sendMessageTo("Mock", senderAddress, senderPort);
     }
 
     @Test
     void walletsResponse() {
+        //given
+        String message = WALLETS_RESPONSE.getCode() + "address1|address2|address3";
+        String senderAddress = "192.168.1.1";
+        String senderPort = "2137";
 
+        //when
+        protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
+
+        //then
+        Mockito.verify(peerToPeerRepository, Mockito.times(1)).saveWalletsAddresses(Arrays.asList("address1", "address2", "address3").toArray(String[]::new));
     }
 
     @Test
     void walletsRequest() {
+        //given
+        Protocol protocol = () -> "Mock";
 
+        String message = WALLETS_REQUEST.getCode();
+        String senderAddress = "192.168.1.1";
+        String senderPort = "2137";
+
+        //when
+        try {
+            Mockito.when(messageFactory.generateMessages(WALLETS_RESPONSE))
+                   .thenReturn(protocol);
+        } catch (BlockChainNodeException e) {
+            e.printStackTrace();
+        }
+        protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
+
+        //then
+        Mockito.verify(peerToPeerService, Mockito.times(1))
+               .sendMessageTo("Mock", senderAddress, senderPort);
+    }
+    @Test
+    void walletDataResponseNotFound() {
+        //given
+        String address = "address";
+
+        String message = WALLET_DATA_RESPONSE.getCode()  + "|" + "|" + address;
+        String senderAddress = "192.168.1.1";
+        String senderPort = "2137";
+
+        //when
+        protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
+
+        //then
+        Mockito.verify(peerToPeerRepository, Mockito.times(0))
+               .saveWalletData(Mockito.any());
     }
 
     @Test
     void walletDataResponse() {
+        //given
+        String amountOfMoney = "142.21576";
+        String publicKey = "PUBLICKEY";
+        String address = "address";
 
+        WalletData walletData = new WalletData();
+        walletData.setAmountOfMoney(amountOfMoney);
+        walletData.setPublicKey(publicKey);
+        walletData.setAddress(address);
+
+        String message = WALLET_DATA_RESPONSE.getCode() + amountOfMoney + "|" + publicKey + "|" + address;
+        String senderAddress = "192.168.1.1";
+        String senderPort = "2137";
+
+        //when
+        protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
+
+        //then
+        Mockito.verify(peerToPeerRepository, Mockito.times(1))
+               .saveWalletData(walletData);
     }
 
     @Test
@@ -85,30 +189,50 @@ class ProtocolInterpreterTest {
         //given
         String message = WALLET_DATA_REQUEST.getCode() + "ADDRESS";
         String messageToSend = WALLET_DATA_RESPONSE.getCode() + "142.52874" + "|" + "PUBLICKEY" + "|" + message;
+        Protocol protocol = () -> messageToSend;
+
         String senderAddress = "192.168.1.1";
         String senderPort = "2137";
 
         //when
+        try {
+            Mockito.when(messageFactory.generateMessages(WALLET_DATA_RESPONSE, "ADDRESS"))
+                   .thenReturn(protocol);
+        } catch (BlockChainNodeException e) {
+            e.printStackTrace();
+        }
         protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
 
         //then
-        Mockito.verify(peerToPeerService, Mockito.times(1)).sendMessageTo(messageToSend, senderAddress, senderPort);
+        Mockito.verify(peerToPeerService, Mockito.times(1))
+               .sendMessageTo(messageToSend, senderAddress, senderPort);
     }
 
     @Test
     void transaction() {
         //given
-        TransactionParams transactionParams = new TransactionParams("addressFrom", "addressTo", "transactionMoneyAmount", "sign");
-        String message = TRANSACTION.getCode() + transactionParams.getAddressFrom() + "|" + transactionParams.getAddressTo() + "|" + transactionParams.getTransactionMoneyAmount() + "|" + transactionParams.getDigitalSign();
+        TransactionParams transactionParams = new TransactionParams("addressFrom",
+                                                                    "addressTo",
+                                                                    "transactionMoneyAmount",
+                                                                    "sign",
+                                                                    1259721);
+        String message = TRANSACTION.getCode()
+                + transactionParams.getAddressFrom() + "|"
+                + transactionParams.getAddressTo() + "|"
+                + transactionParams.getTransactionMoneyAmount() + "|"
+                + transactionParams.getDigitalSign() + "|"
+                + transactionParams.getTimeStamp();
         String senderAddress = "192.168.1.1";
         String senderPort = "2137";
 
         //when
-        Mockito.when(validator.isTransactionValid(transactionParams)).thenReturn(true);
+        Mockito.when(validator.isTransactionValid(transactionParams))
+               .thenReturn(true);
         protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
 
         //then
-        Mockito.verify(blockBuilder, Mockito.times(1)).addDataToNextBlock(message);
+        Mockito.verify(blockBuilder, Mockito.times(1))
+               .addDataToNextBlock(message);
     }
 
 
@@ -125,11 +249,13 @@ class ProtocolInterpreterTest {
         String senderPort = "2137";
 
         //when
-        Mockito.when(validator.isBlockValid(block)).thenReturn(true);
+        Mockito.when(validator.isBlockValid(block))
+               .thenReturn(true);
         protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
 
         //then
-        Mockito.verify(blockChainRepository, Mockito.times(1)).addToBlockChain(block);
+        Mockito.verify(blockChainRepository, Mockito.times(1))
+               .addToBlockChain(block);
     }
 
 
@@ -143,11 +269,13 @@ class ProtocolInterpreterTest {
         String senderPort = "2137";
 
         //when
-        Mockito.when(validator.isWalletValid(hash, address)).thenReturn(true);
+        Mockito.when(validator.isWalletValid(hash, address))
+               .thenReturn(true);
         protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
 
         //then
-        Mockito.verify(blockBuilder, Mockito.times(1)).addDataToNextBlock(message);
+        Mockito.verify(blockBuilder, Mockito.times(1))
+               .addDataToNextBlock(message);
     }
 
     @Test
@@ -162,6 +290,7 @@ class ProtocolInterpreterTest {
         protocolInterpreter.interpretMessage(message, senderAddress, senderPort);
 
         //then
-        Mockito.verify(peerToPeerRepository, Mockito.times(1)).saveNode(blockChainNode);
+        Mockito.verify(peerToPeerRepository, Mockito.times(1))
+               .saveNode(blockChainNode);
     }
 }

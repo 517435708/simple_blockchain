@@ -17,9 +17,6 @@ class NodesResponseMessage implements Protocol {
 
     @Override
     public String generateMessage() {
-        StringBuilder message = new StringBuilder(NODES_RESPONSE.getCode());
-        Gson gson = new Gson();
-        message.append(gson.toJson(nodes));
-        return message.toString();
+        return NODES_RESPONSE.getCode() + new Gson().toJson(nodes);
 }
 }

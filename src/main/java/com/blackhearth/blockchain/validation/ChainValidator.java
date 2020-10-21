@@ -1,7 +1,7 @@
 package com.blackhearth.blockchain.validation;
 
 import com.blackhearth.blockchain.block.Block;
-import com.blackhearth.blockchain.block.BlockChainRepository;
+import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
