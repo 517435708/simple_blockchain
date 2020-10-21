@@ -2,11 +2,9 @@ package com.blackhearth.blockchain;
 
 import com.blackhearth.blockchain.params_reader.ParamsReader;
 import com.blackhearth.blockchain.params_reader.RunParams;
-import com.blackhearth.blockchain.peertopeer.BasicBlockChainCommunication;
+import com.blackhearth.blockchain.peertopeer.InterpreterBlockChainCommunication;
 import com.blackhearth.blockchain.peertopeer.BasicPeerToPeerService;
-import com.blackhearth.blockchain.peertopeer.PeerToPeerService;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -20,8 +18,10 @@ public class SimpleBlockchainApplication {
 		SpringApplication.run(SimpleBlockchainApplication.class, args);
 		Map<RunParams, Object> params = ParamsReader.getParams(args);
 
-		BasicPeerToPeerService basicPeerToPeerService = new BasicPeerToPeerService(new BasicBlockChainCommunication());
+		BasicPeerToPeerService basicPeerToPeerService = new BasicPeerToPeerService(new InterpreterBlockChainCommunication());
 		basicPeerToPeerService.start(1234);
+
+		System.out.println(basicPeerToPeerService.getLocalNodeChainData());
 	}
 
 

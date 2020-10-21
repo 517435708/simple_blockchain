@@ -1,25 +1,23 @@
 package com.blackhearth.blockchain.peertopeer;
 
 import com.blackhearth.blockchain.node.BlockChainNodeData;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 @Component
+@RequiredArgsConstructor
 public class BasicPeerToPeerService implements PeerToPeerService {
-    private BlockChainCommunication communication;
-
-    @Autowired
-    public BasicPeerToPeerService(BlockChainCommunication communication) {
-        this.communication = communication;
-    }
+    private final BlockChainCommunication communication;
+    private int tcpPort = 0;
 
     @Override
     public void start(int tcpPort) throws IOException {
+        this.tcpPort = tcpPort;
         communication.start(tcpPort);
-        communication.addListenerOnReceived(() -> System.out.println("SUCCESS! RECEIVED STH"));
     }
 
     @SneakyThrows
@@ -34,8 +32,8 @@ public class BasicPeerToPeerService implements PeerToPeerService {
     }
 
     @Override
-    public BlockChainNodeData getNodeChainData() {
-        // TODO: 21.10.2020  
-        return null;
+    public BlockChainNodeData getLocalNodeChainData() {
+        InetAddress localHostLANAddress = IpUtils.getLocalHostLANAddress();
+        return new BlockChainNodeData(tcpPort, localHostLANAddress.getHostAddress());
     }
 }

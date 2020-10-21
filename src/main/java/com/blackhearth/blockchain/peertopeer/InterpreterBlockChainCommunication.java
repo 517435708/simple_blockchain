@@ -1,5 +1,6 @@
 package com.blackhearth.blockchain.peertopeer;
 
+import com.blackhearth.blockchain.protocol.interpreter.ProtocolInterpreter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -12,12 +13,15 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-public class BasicBlockChainCommunication implements BlockChainCommunication {
+public class InterpreterBlockChainCommunication implements BlockChainCommunication {
     private static final int CONNECTION_TIMEOUT = 5000;
     private Server server;
     private Client client;
 
-    public BasicBlockChainCommunication() {
+    // TODO: 21.10.2020 initialize
+    private ProtocolInterpreter interpreter;
+
+    public InterpreterBlockChainCommunication() {
         this.server = new Server();
         this.client = new Client();
         registerCommunicationClass();
@@ -27,19 +31,7 @@ public class BasicBlockChainCommunication implements BlockChainCommunication {
     public void start(int tcpPort) throws IOException {
         server.start();
         server.bind(tcpPort);
-    }
-
-    @Override
-    public void addListenerOnReceived(Runnable toRunOnReceived) {
-        server.addListener(new Listener() {
-            public void received (Connection connection, Object object) {
-
-                if (object instanceof CommunicationObject) {
-                    log.info("Received: {}", ((CommunicationObject) object).getText());
-                    // interpreteMessage
-                }
-            }
-        });
+        initializeInterpreter();
     }
 
     @Override
@@ -63,6 +55,26 @@ public class BasicBlockChainCommunication implements BlockChainCommunication {
 
         Kryo clientKryo = client.getKryo();
         clientKryo.register(CommunicationObject.class);
+    }
+
+    private void initializeInterpreter() {
+        server.addListener(new Listener() {
+            @Override
+            public void received (Connection connection, Object object) {
+                if (object instanceof CommunicationObject) {
+                    delegateToInterpretMessage(connection, (CommunicationObject) object);
+                }
+            }
+        });
+    }
+
+    private void delegateToInterpretMessage(Connection connection, CommunicationObject object) {
+        String hostAddress = connection.getRemoteAddressTCP().getAddress().getHostAddress();
+        String port = String.valueOf(connection.getRemoteAddressTCP().getPort());
+        String text = object.getText();
+
+        log.info("Interpreting: {} from {}:{}", text, hostAddress, port);
+        interpreter.interpretMessage(text, hostAddress, port);
     }
 }
 

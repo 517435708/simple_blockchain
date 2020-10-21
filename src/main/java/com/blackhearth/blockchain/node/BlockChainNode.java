@@ -1,9 +1,9 @@
 package com.blackhearth.blockchain.node;
 
-import com.blackhearth.blockchain.peertopeer.BasicPeerToPeerService;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,8 +27,9 @@ public class BlockChainNode {
     private PeerToPeerService p2pService;
     private int port;
 
+    @SneakyThrows(IOException.class)
     public BlockChainNodeData start() throws
-            BlockChainNodeException, IOException {
+            BlockChainNodeException {
         if (!isNodeRunning) {
             socket = openSocket();
             runNode();
