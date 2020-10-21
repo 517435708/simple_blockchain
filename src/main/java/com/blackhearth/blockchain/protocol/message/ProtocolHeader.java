@@ -2,6 +2,8 @@ package com.blackhearth.blockchain.protocol.message;
 
 import lombok.Getter;
 
+import java.util.Optional;
+
 public enum ProtocolHeader {
 
     NOTIFY_NODE("NN"),
@@ -22,5 +24,14 @@ public enum ProtocolHeader {
 
     @Getter
     private final String code;
+
+    public static Optional<ProtocolHeader> getFromCode(String code) {
+        for (var header : values()) {
+            if (header.code.equals(code)) {
+                return Optional.of(header);
+            }
+        }
+        return Optional.empty();
+    }
 
 }

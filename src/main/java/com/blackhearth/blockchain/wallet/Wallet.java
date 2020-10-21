@@ -2,7 +2,6 @@ package com.blackhearth.blockchain.wallet;
 
 import lombok.Data;
 
-import javax.crypto.Cipher;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
