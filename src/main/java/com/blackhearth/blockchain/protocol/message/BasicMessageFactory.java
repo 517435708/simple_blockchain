@@ -153,8 +153,11 @@ public class BasicMessageFactory implements MessageFactory {
     @SneakyThrows
     private Protocol generateNotifyNodeMessage() throws
                                                  BlockChainNodeException {
+
+
         NotifyNodeMessage notifyNodeMessage = new NotifyNodeMessage();
         BlockChainNodeData data = blockChainNode.start();
+
         notifyNodeMessage.setBlockChainNode(data);
         return notifyNodeMessage;
     }

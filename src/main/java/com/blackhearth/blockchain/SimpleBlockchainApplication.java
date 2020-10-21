@@ -14,6 +14,7 @@ import java.util.Map;
 
 @SpringBootApplication
 public class SimpleBlockchainApplication {
+
 	@SneakyThrows
 	public static void main(String[] args) {
 		SpringApplication.run(SimpleBlockchainApplication.class, args);

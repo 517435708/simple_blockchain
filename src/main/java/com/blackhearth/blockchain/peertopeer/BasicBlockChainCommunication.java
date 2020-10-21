@@ -33,11 +33,10 @@ public class BasicBlockChainCommunication implements BlockChainCommunication {
     public void addListenerOnReceived(Runnable toRunOnReceived) {
         server.addListener(new Listener() {
             public void received (Connection connection, Object object) {
+
                 if (object instanceof CommunicationObject) {
-                    // TODO: 21.10.2020 obsługiwanie zapytać, ale nie
-                    // wiem co powinno tej metody uzyć
                     log.info("Received: {}", ((CommunicationObject) object).getText());
-                    toRunOnReceived.run(); // todo - a może po prostu metoda, która obsługuje zapytania???
+                    // interpreteMessage
                 }
             }
         });
