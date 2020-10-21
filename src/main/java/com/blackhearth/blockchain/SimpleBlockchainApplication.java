@@ -1,7 +1,7 @@
 package com.blackhearth.blockchain;
 
-import com.blackhearth.blockchain.params_reader.ParamsReader;
-import com.blackhearth.blockchain.params_reader.RunParams;
+import com.blackhearth.blockchain.paramsreader.ParamsReader;
+import com.blackhearth.blockchain.paramsreader.RunParams;
 import com.blackhearth.blockchain.peertopeer.InterpreterBlockChainCommunication;
 import com.blackhearth.blockchain.peertopeer.BasicPeerToPeerService;
 import lombok.SneakyThrows;
