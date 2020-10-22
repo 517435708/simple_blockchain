@@ -1,5 +1,8 @@
 package com.blackhearth.blockchain.block;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class BasicBlockMiner implements BlockMiner {
 
     @Override

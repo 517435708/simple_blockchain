@@ -7,11 +7,8 @@ import java.util.Random;
 
 @Configuration
 public class Config {
-
-
     @Bean
     Random random() {
         return new Random();
     }
-
 }

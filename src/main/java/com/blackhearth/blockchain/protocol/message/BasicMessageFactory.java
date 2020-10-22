@@ -10,6 +10,7 @@ import com.blackhearth.blockchain.wallet.Transaction;
 import com.blackhearth.blockchain.wallet.Wallet;
 import com.blackhearth.blockchain.wallet.WalletData;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -149,10 +150,14 @@ public class BasicMessageFactory implements MessageFactory {
         return notifyWalletMessage;
     }
 
+    @SneakyThrows
     private Protocol generateNotifyNodeMessage() throws
                                                  BlockChainNodeException {
+
+
         NotifyNodeMessage notifyNodeMessage = new NotifyNodeMessage();
         BlockChainNodeData data = blockChainNode.start();
+
         notifyNodeMessage.setBlockChainNode(data);
         return notifyNodeMessage;
     }
