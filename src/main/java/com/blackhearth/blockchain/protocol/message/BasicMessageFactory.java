@@ -1,21 +1,19 @@
 package com.blackhearth.blockchain.protocol.message;
 
 import com.blackhearth.blockchain.block.Block;
-import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.block.BlockMiner;
+import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
+import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import com.blackhearth.blockchain.wallet.Transaction;
 import com.blackhearth.blockchain.wallet.Wallet;
-import com.blackhearth.blockchain.wallet.WalletData;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Component
@@ -25,6 +23,7 @@ public class BasicMessageFactory implements MessageFactory {
     private final BlockMiner blockMiner;
     private final BlockChainNode blockChainNode;
     private final BlockChainRepository blockChainRepository;
+    private final PeerToPeerRepository peerToPeerRepository;
     private final Wallet wallet;
 
     @Override
@@ -84,7 +83,7 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateNodesResponseMessage() {
-        List<BlockChainNodeData> data = blockChainRepository.getNodes();
+        List<BlockChainNodeData> data = peerToPeerRepository.getNodes();
         NodesResponseMessage nodesResponseMessage = new NodesResponseMessage();
         nodesResponseMessage.setNodes(data);
         return nodesResponseMessage;
@@ -95,11 +94,9 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateWalletsResponseMessage() {
-        List<WalletData> data = blockChainRepository.getWallets();
+        List<String> data = blockChainRepository.getWallets();
         WalletsResponseMessage walletsResponseMessage = new WalletsResponseMessage();
-        walletsResponseMessage.setWallets(data.stream()
-                                              .map(WalletData::getAddress)
-                                              .collect(Collectors.toList()));
+        walletsResponseMessage.setWallets(data);
         return walletsResponseMessage;
     }
 
