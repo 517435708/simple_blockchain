@@ -28,11 +28,12 @@ public class BasicPeerToPeerService implements PeerToPeerService {
 
     @Override
     public void sendMessageToAllKnownNodes(String message) {
-        // TODO: 21.10.2020
+        communication.getAllKnownHosts()
+                .forEach(host -> sendMessageTo(message, host.getAddress(), String.valueOf(host.getPort())));
     }
 
     @Override
-    public BlockChainNodeData getLocalNodeChainData() {
+    public BlockChainNodeData getLocalBlockChainNodeData() {
         InetAddress localHostLANAddress = IpUtils.getLocalHostLANAddress();
         return new BlockChainNodeData(tcpPort, localHostLANAddress.getHostAddress());
     }
