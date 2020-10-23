@@ -23,16 +23,21 @@ public class SignatureUtils {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
+            byteArrayToHexString(hexString, hash);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return hexString.toString();
 
+    }
+
+    private static void byteArrayToHexString(StringBuilder hexString, byte[] hash) {
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
     }
 }
