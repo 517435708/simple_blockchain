@@ -2,6 +2,6 @@ package com.blackhearth.blockchain.wallet.transaction;
 
 import java.security.PrivateKey;
 
-interface TransactionFactory {
+interface TransactionService {
     String addSignature(PrivateKey privateKey, Transaction transaction);
 }

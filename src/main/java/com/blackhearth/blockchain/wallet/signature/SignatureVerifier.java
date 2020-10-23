@@ -1,8 +1,13 @@
 package com.blackhearth.blockchain.wallet.signature;
 
+import lombok.NoArgsConstructor;
+
 import java.security.*;
 import java.util.Base64;
 
+import static lombok.AccessLevel.PRIVATE;
+
+@NoArgsConstructor(access = PRIVATE)
 public class SignatureVerifier {
     public static boolean verifySignature(PublicKey publicKey, String data, String signature) {
         try {
@@ -17,6 +22,4 @@ public class SignatureVerifier {
 
         return false;
     }
-
-    private SignatureVerifier(){}
 }

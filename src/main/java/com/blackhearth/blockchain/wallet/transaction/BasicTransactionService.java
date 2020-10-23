@@ -9,7 +9,7 @@ import java.security.PrivateKey;
 
 @Component
 @NoArgsConstructor
-public class BasicTransactionFactory implements TransactionFactory {
+public class BasicTransactionService implements TransactionService {
 
     @Override
     @SneakyThrows

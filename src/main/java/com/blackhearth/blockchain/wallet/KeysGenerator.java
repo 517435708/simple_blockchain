@@ -1,7 +1,10 @@
 package com.blackhearth.blockchain.wallet;
 
+import lombok.Getter;
+
 import java.security.*;
 
+@Getter
 public class KeysGenerator {
 
     private KeyPairGenerator keyGen;
@@ -19,13 +22,4 @@ public class KeysGenerator {
         privateKey = pair.getPrivate();
         publicKey = pair.getPublic();
     }
-
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-
 }

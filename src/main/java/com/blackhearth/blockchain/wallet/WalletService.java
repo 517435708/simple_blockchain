@@ -1,6 +1,6 @@
 package com.blackhearth.blockchain.wallet;
 
-public interface WalletFactory {
+public interface WalletService {
 
     String setWalletHash(Wallet wallet);
 }
