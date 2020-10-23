@@ -44,8 +44,10 @@ public class ChainValidator implements Validator {
     }
 
     private boolean isHashesValid(Block block) {
-        int blockPosition = repository.getPositionFromBlockHash(block.getHash()).orElse(0);
-        List<Block> blockchain = repository.getBlocksFromPosition(0, blockPosition);
+        List<Block> blockchain = repository.getChainToBlockHash(block.getPreviousHash());
+        if (blockchain.isEmpty()) {
+            return false;
+        }
 
         for (int i = 1; i < blockchain.size(); i++) {
             Block currentBlock = blockchain.get(i);

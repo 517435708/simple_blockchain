@@ -3,13 +3,14 @@ package com.blackhearth.blockchain.block;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Configuration
 public class BlockChainConfig {
     @Bean("blockChain")
-    public List<Block> blockchain() {
-        return new ArrayList<>();
+    public Map<String, List<Block>> blockchain() {
+        Map<String, List<Block>> hashMap = new HashMap<>();
+        hashMap.put("", new ArrayList<>());
+        return hashMap;
     }
 }
