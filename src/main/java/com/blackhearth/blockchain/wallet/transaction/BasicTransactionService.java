@@ -15,7 +15,7 @@ public class BasicTransactionService implements TransactionService {
     @SneakyThrows
     public String addSignature(PrivateKey privateKey, Transaction transaction) {
         if (transaction.getAddress() != null && transaction.getSender() != null
-                && transaction.getReciepient() != null && transaction.getAmount() > 0L) {
+                && transaction.getReciepient() != null && Long.parseLong(transaction.getAmount()) > 0L) {
             return SignatureApplier.applySignature(privateKey, transaction.getTransactionData());
         } else {
             throw new TransactionExeption("Something went wrong while adding signature! ;(");

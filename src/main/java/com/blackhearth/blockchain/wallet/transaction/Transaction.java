@@ -13,10 +13,10 @@ public class Transaction {
     private PublicKey reciepient; //Recipients address/public key.
     private String signature;
 
-    private long amount; //Contains the amount we wish to send to the recipient.
+    private String amount; //Contains the amount we wish to send to the recipient.
     private long timeStamp;
 
-    public Transaction(String address, PublicKey from, PublicKey to, long amount) {
+    public Transaction(String address, PublicKey from, PublicKey to, String amount) {
         this.address = address;
         this.sender = from;
         this.reciepient = to;

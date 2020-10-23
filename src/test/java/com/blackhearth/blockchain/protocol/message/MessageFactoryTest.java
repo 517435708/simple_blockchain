@@ -123,7 +123,7 @@ class MessageFactoryTest {
 
         Transaction transaction = new Transaction();
         transaction.setAddress("adres");
-        transaction.setAmount((long) 12.12);
+        transaction.setAmount("12.12");
         transaction.setSignature("sign");
         transaction.setTimeStamp(1337);
 

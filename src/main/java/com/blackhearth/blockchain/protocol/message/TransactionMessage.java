@@ -11,7 +11,7 @@ class TransactionMessage implements Protocol {
 
     private String senderAddress;
     private String receiverAddress;
-    private long amountOfCoinTransferred;
+    private String amountOfCoinTransferred;
     private String digitalSignature;
     private long timeStamp;
 

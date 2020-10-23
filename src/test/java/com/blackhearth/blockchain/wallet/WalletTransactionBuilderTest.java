@@ -48,7 +48,7 @@ class WalletTransactionBuilderTest {
 
         Transaction lastTransaction = new Transaction();
         lastTransaction.setAddress(walletA.getHash());
-        lastTransaction.setAmount(100L);
+        lastTransaction.setAmount("100");
         lastTransaction.setReciepient(walletA.getPublicKey());
         lastTransaction.setSender(walletB.getPublicKey());
         lastTransaction.setTimeStamp(1235);
@@ -61,7 +61,7 @@ class WalletTransactionBuilderTest {
     static void initTransaction() {
         basicTransactionFactory = new BasicTransactionService();
 
-        transaction = new Transaction(walletA.getHash(), walletA.getPublicKey(), walletB.getPublicKey(), 200);
+        transaction = new Transaction(walletA.getHash(), walletA.getPublicKey(), walletB.getPublicKey(), "200");
         transaction.setSignature(basicTransactionFactory.addSignature(walletA.getPrivateKey(), transaction));
     }
 
