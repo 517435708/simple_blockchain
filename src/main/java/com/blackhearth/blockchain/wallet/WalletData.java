@@ -1,16 +1,14 @@
 package com.blackhearth.blockchain.wallet;
 
-import com.blackhearth.blockchain.wallet.signature.SignatureUtils;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
-import java.security.PublicKey;
+import lombok.Setter;
 
 @Getter
+@Setter
+@EqualsAndHashCode
 public class WalletData {
     private String address;
-
-    public WalletData(PublicKey publicKey, String password) {
-        this.address = SignatureUtils.applySha256(
-                SignatureUtils.getStringFromKey(publicKey) + password);
-    }
+    private String amountOfMoney;
+    private String publicKey;
 }

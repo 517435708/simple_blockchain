@@ -1,19 +1,19 @@
 package com.blackhearth.blockchain.protocol.message;
 
 import com.blackhearth.blockchain.block.Block;
-import com.blackhearth.blockchain.block.BlockChainRepository;
+import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.block.BlockMiner;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
+import com.blackhearth.blockchain.wallet.Transaction;
 import com.blackhearth.blockchain.wallet.Wallet;
 import com.blackhearth.blockchain.wallet.WalletData;
-import com.blackhearth.blockchain.wallet.transactions.Transaction;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +28,8 @@ public class BasicMessageFactory implements MessageFactory {
     private final Wallet wallet;
 
     @Override
-    public List<Protocol> generateMessages(ProtocolHeader header, String walletAddress) throws
-                                                                                        BlockChainNodeException {
+    public Protocol generateMessages(ProtocolHeader header, String walletAddress) throws
+                                                                                  BlockChainNodeException {
         switch (header) {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
@@ -52,13 +52,13 @@ public class BasicMessageFactory implements MessageFactory {
             case NODES_RESPONSE:
                 return generateNodesResponseMessage();
             default:
-                return Collections.emptyList();
+                throw new BlockChainNodeException("Wrong Key");
         }
     }
 
     @Override
-    public List<Protocol> generateMessages(ProtocolHeader header) throws
-                                                                  BlockChainNodeException {
+    public Protocol generateMessages(ProtocolHeader header) throws
+                                                            BlockChainNodeException {
         switch (header) {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
@@ -79,98 +79,86 @@ public class BasicMessageFactory implements MessageFactory {
             case NODES_RESPONSE:
                 return generateNodesResponseMessage();
             default:
-                return Collections.emptyList();
+                throw new BlockChainNodeException("Wrong Key");
         }
     }
 
-    private List<Protocol> generateNodesResponseMessage() {
-        int position = 0;
-        int increment = 10;
-        List<BlockChainNodeData> data;
-        List<Protocol> protocols = new ArrayList<>();
-        do {
-            data = blockChainRepository.getNodesFromPosition(position, increment);
-            NodesResponseMessage nodesResponseMessage = new NodesResponseMessage();
-            nodesResponseMessage.setNodes(data);
-            nodesResponseMessage.setMessagePosition(String.valueOf(position));
-            protocols.add(nodesResponseMessage);
-            position += increment;
-        } while (!data.isEmpty());
-        return protocols;
+    private Protocol generateNodesResponseMessage() {
+        List<BlockChainNodeData> data = blockChainRepository.getNodes();
+        NodesResponseMessage nodesResponseMessage = new NodesResponseMessage();
+        nodesResponseMessage.setNodes(data);
+        return nodesResponseMessage;
     }
 
-    private List<Protocol> generateNodesRequestMessage() {
-        return Collections.singletonList(new NodesRequestMessage());
+    private Protocol generateNodesRequestMessage() {
+        return new NodesRequestMessage();
     }
 
-    private List<Protocol> generateWalletsResponseMessage() {
-        int position = 0;
-        int increment = 10;
-        List<WalletData> data;
-        List<Protocol> protocols = new ArrayList<>();
-        do {
-            data = blockChainRepository.getWalletsFromPosition(position, increment);
-            WalletsResponseMessage walletsResponseMessage = new WalletsResponseMessage();
-            walletsResponseMessage.setWallets(data.stream()
-                                                  .map(WalletData::getAddress)
-                                                  .collect(Collectors.toList()));
-            walletsResponseMessage.setMessagePosition(String.valueOf(position));
-            protocols.add(walletsResponseMessage);
-            position += increment;
-        } while (!data.isEmpty());
-        return protocols;
+    private Protocol generateWalletsResponseMessage() {
+        List<WalletData> data = blockChainRepository.getWallets();
+        WalletsResponseMessage walletsResponseMessage = new WalletsResponseMessage();
+        walletsResponseMessage.setWallets(data.stream()
+                                              .map(WalletData::getAddress)
+                                              .collect(Collectors.toList()));
+        return walletsResponseMessage;
     }
 
-    private List<Protocol> generateWalletsRequestMessage() {
-        return Collections.singletonList(new WalletsRequestMessage());
+    private Protocol generateWalletsRequestMessage() {
+        return new WalletsRequestMessage();
     }
 
-    private List<Protocol> generateWalletDataResponseMessage(String address) {
+    private Protocol generateWalletDataResponseMessage(String address) {
         WalletDataResponseMessage walletDataResponseMessage = new WalletDataResponseMessage();
         walletDataResponseMessage.setAddress(address);
         walletDataResponseMessage.setAmountOfCoins(blockChainRepository.getCoinsFromAddress(address)
                                                                        .orElse(""));
         walletDataResponseMessage.setPublicKey(blockChainRepository.getPublicKeyFromAddress(address)
                                                                    .orElse(""));
-        return Collections.singletonList(walletDataResponseMessage);
+        return walletDataResponseMessage;
     }
 
-    private List<Protocol> generateWalletDataRequestMessage() {
+    private Protocol generateWalletDataRequestMessage() {
         WalletDataRequestMessage walletDataRequestMessage = new WalletDataRequestMessage();
         walletDataRequestMessage.setWalletAddress(wallet.getHash());
-        return Collections.singletonList(walletDataRequestMessage);
+        return walletDataRequestMessage;
     }
 
-    private List<Protocol> generateAddTransactionMessage() {
+    private Protocol generateAddTransactionMessage() {
         TransactionMessage transactionMessage = new TransactionMessage();
         transactionMessage.setSenderAddress(wallet.getHash());
+
         Transaction transaction = wallet.getLastTransaction();
         transactionMessage.setAmountOfCoinTransferred(transaction.getAmount());
         transactionMessage.setReceiverAddress(transaction.getAddress());
-        transactionMessage.setDigitalSignature(transaction.getSignature());
-        return Collections.singletonList(transactionMessage);
+        transactionMessage.setDigitalSignature(transaction.getSign());
+        transactionMessage.setTimeStamp(transaction.getTimeStamp());
+        return transactionMessage;
     }
 
-    private List<Protocol> generateAddBlockMessage() {
+    private Protocol generateAddBlockMessage() {
         Block block = blockMiner.mineBlock();
         AddBlockMessage addBlockMessage = new AddBlockMessage();
         addBlockMessage.setBlock(block);
-        return Collections.singletonList(addBlockMessage);
+        return addBlockMessage;
     }
 
-    private List<Protocol> generateNotifyWalletMessage() {
+    private Protocol generateNotifyWalletMessage() {
         NotifyWalletMessage notifyWalletMessage = new NotifyWalletMessage();
         notifyWalletMessage.setPublicKey(wallet.getPublicKey()
                                                .toString());
         notifyWalletMessage.setWalletHash(wallet.getHash());
-        return Collections.singletonList(notifyWalletMessage);
+        return notifyWalletMessage;
     }
 
-    private List<Protocol> generateNotifyNodeMessage() throws
-                                                       BlockChainNodeException {
+    @SneakyThrows
+    private Protocol generateNotifyNodeMessage() throws
+                                                 BlockChainNodeException {
+
+
         NotifyNodeMessage notifyNodeMessage = new NotifyNodeMessage();
         BlockChainNodeData data = blockChainNode.start();
+
         notifyNodeMessage.setBlockChainNode(data);
-        return Collections.singletonList(notifyNodeMessage);
+        return notifyNodeMessage;
     }
 }

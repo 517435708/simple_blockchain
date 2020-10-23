@@ -1,12 +1,16 @@
 package com.blackhearth.blockchain.validation;
 
 import com.blackhearth.blockchain.block.Block;
-import com.blackhearth.blockchain.block.BlockChainRepository;
+import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
+@Component
 public class ChainValidator implements Validator {
     private static final String HASH_STARTS_WITH = "000001";
     private BlockChainRepository repository;
@@ -17,8 +21,13 @@ public class ChainValidator implements Validator {
     }
 
     @Override
-    public boolean isTransactionValid(TransactionParams params, Block block) {
+    public boolean isTransactionValid(TransactionParams params) {
         return isEnoughMoney(params) && isAddressToExists(params) && isSignValid();
+    }
+
+    @Override
+    public boolean isWalletValid(String hash, String publicKey) {
+        return false; //TODO
     }
 
     private boolean isEnoughMoney(TransactionParams params) {
