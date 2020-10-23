@@ -30,4 +30,6 @@ public class SignatureUtils {
         return hexString.toString();
 
     }
+
+    private SignatureUtils(){}
 }

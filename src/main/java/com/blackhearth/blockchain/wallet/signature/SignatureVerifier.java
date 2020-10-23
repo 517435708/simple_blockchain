@@ -17,4 +17,6 @@ public class SignatureVerifier {
 
         return false;
     }
+
+    private SignatureVerifier(){}
 }

@@ -1,6 +1,5 @@
 package com.blackhearth.blockchain.wallet;
 
-
 import java.security.*;
 
 public class KeysGenerator {
@@ -10,23 +9,23 @@ public class KeysGenerator {
     private PublicKey publicKey;
 
     public KeysGenerator(int keylength) throws NoSuchAlgorithmException {
-        this.keyGen = KeyPairGenerator.getInstance("RSA");
-        this.keyGen.initialize(keylength);
-        this.createKeys();
+        keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(keylength);
+        createKeys();
     }
 
     private void createKeys() {
         KeyPair pair = keyGen.generateKeyPair();
-        this.privateKey = pair.getPrivate();
-        this.publicKey = pair.getPublic();
+        privateKey = pair.getPrivate();
+        publicKey = pair.getPublic();
     }
 
     public PrivateKey getPrivateKey() {
-        return this.privateKey;
+        return privateKey;
     }
 
     public PublicKey getPublicKey() {
-        return this.publicKey;
+        return publicKey;
     }
 
 }
