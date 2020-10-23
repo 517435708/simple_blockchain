@@ -2,7 +2,7 @@ package com.blackhearth.blockchain.wallet;
 
 import com.blackhearth.blockchain.wallet.signature.SignatureVerifier;
 import com.blackhearth.blockchain.wallet.transaction.Transaction;
-import com.blackhearth.blockchain.wallet.transaction.BasicTransactionFactory;
+import com.blackhearth.blockchain.wallet.transaction.BasicTransactionService;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,8 @@ class WalletTransactionBuilderTest {
     private static Wallet walletA;
     private static Wallet walletB;
     private static Transaction transaction;
-    private static BasicTransactionFactory basicTransactionFactory;
-    private static BasicWalletFactory basicWalletFactory;
+    private static BasicTransactionService basicTransactionFactory;
+    private static BasicWalletService basicWalletFactory;
 
 
     @BeforeAll
@@ -25,7 +25,7 @@ class WalletTransactionBuilderTest {
         walletA = new Wallet();
         walletB = new Wallet();
 
-        basicWalletFactory = new BasicWalletFactory();
+        basicWalletFactory = new BasicWalletService();
 
         KeysGenerator keysGeneratorA = new KeysGenerator(512);
         PrivateKey skA = keysGeneratorA.getPrivateKey();
@@ -59,7 +59,7 @@ class WalletTransactionBuilderTest {
 
     @BeforeAll
     static void initTransaction() {
-        basicTransactionFactory = new BasicTransactionFactory();
+        basicTransactionFactory = new BasicTransactionService();
 
         transaction = new Transaction(walletA.getHash(), walletA.getPublicKey(), walletB.getPublicKey(), 200);
         transaction.setSignature(basicTransactionFactory.addSignature(walletA.getPrivateKey(), transaction));
