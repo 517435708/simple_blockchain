@@ -1,48 +1,174 @@
 package com.blackhearth.blockchain.block.repository;
 
 import com.blackhearth.blockchain.block.Block;
-import com.blackhearth.blockchain.node.BlockChainNodeData;
-import com.blackhearth.blockchain.wallet.WalletData;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.NOTIFY_WALLET;
+import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.TRANSACTION;
 
 @Repository
 public class BasicBlockChainRepository implements BlockChainRepository {
+
+    private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "[a-zA-Z0-9]+\\|[a-zA-Z0-9]+\\|(-?\\d+\\.?\\d*)");
+    @Resource(name = "blockChain")
+    private Map<String, List<Block>> blockChain;
+
     @Override
     public Optional<String> getCoinsFromAddress(String walletAddress) {
-        return Optional.empty();
+
+        List<Block> longestChain = extractLongestChain();
+        if (walletNotRegistered(walletAddress, longestChain)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(String.valueOf(getAmountOfCoinsFromTransactions(walletAddress, longestChain)));
     }
 
     @Override
-    public List<Block> getBlocksFromPosition(int position, int blocks) {
-        return null;
-    }
+    public List<Block> getChainToBlockHash(String hash) {
+        for (var entry : blockChain.entrySet()) {
+            List<Block> chain = entry.getValue();
+            if (chain.get(chain.size() - 1)
+                     .getHash()
+                     .equals(hash)) {
+                return chain;
+            }
+        }
 
-    @Override
-    public Optional<Integer> getPositionFromBlockHash(String hash) {
-        return Optional.empty();
+        for (var entry : blockChain.entrySet()) {
+            for (var block : entry.getValue()) {
+                if (block.getHash()
+                         .equals(hash)) {
+                    blockChain.put(hash,
+                                   entry.getValue()
+                                        .subList(0,
+                                                 entry.getValue()
+                                                      .indexOf(block)));
+                    return blockChain.get(hash);
+                }
+            }
+        }
+
+        return Collections.emptyList();
     }
 
     @Override
     public Optional<String> getPublicKeyFromAddress(String address) {
-        return Optional.empty();
+        List<Block> longestChain = extractLongestChain();
+
+        return Optional.ofNullable(searchThroughChain(longestChain, null, row -> {
+            if (row.contains(NOTIFY_WALLET.getCode()) && row.contains(address)) {
+                String[] values = row.split("HASH:");
+                return values[0].substring(2);
+            } else {
+                return null;
+            }
+        }));
     }
 
     @Override
-    public List<WalletData> getWallets() {
-        return null;
-    }
-
-    @Override
-    public List<BlockChainNodeData> getNodes() {
-        return null;
+    public List<String> getWallets() {
+        List<Block> longestChain = extractLongestChain();
+        List<String> wallets = new ArrayList<>();
+        searchThroughChain(longestChain, null, row -> {
+            if (row.contains(NOTIFY_WALLET.getCode())) {
+                String[] args = row.split("HASH:");
+                wallets.add(args[0].substring(2));
+            }
+            return null;
+        });
+        return wallets;
     }
 
     @Override
     public void addToBlockChain(Block block) {
+        getChainToBlockHash(block.getPreviousHash()).add(block);
+    }
 
+    @Override
+    public String getLastBlockHash() {
+        var list = extractLongestChain();
+        if (list.isEmpty()) {
+            return "";
+        }
+        return list.get(list.size() - 1)
+                   .getHash();
+    }
+
+    private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
+        return searchThroughChain(longestChain, false, record -> {
+            if (record.contains(NOTIFY_WALLET.getCode()) && record.contains(walletAddress)) {
+                return true;
+            } else {
+                return null;
+            }
+        });
+    }
+
+    private List<Block> extractLongestChain() {
+
+        if (blockChain.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String hash = "";
+        int maxSize = 0;
+        for (var hashByChain : blockChain.entrySet()) {
+            int size = hashByChain.getValue()
+                                  .size();
+            if (maxSize < size) {
+                hash = hashByChain.getKey();
+                maxSize = size;
+            }
+        }
+        for (var hashByChain : blockChain.entrySet()) {
+            int size = hashByChain.getValue()
+                                  .size();
+            if (maxSize - size > 5) {
+                blockChain.remove(hashByChain.getKey());
+            }
+        }
+        return blockChain.get(hash);
+    }
+
+    private Double getAmountOfCoinsFromTransactions(String address, List<Block> longestChain) {
+
+        double value = 0;
+
+        for (var block : longestChain) {
+            String[] data = block.getData()
+                                 .split("\\n");
+            value += Stream.of(data)
+                           .filter(string -> string.contains(address))
+                           .map(transactionPattern::matcher)
+                           .filter(Matcher::find)
+                           .mapToDouble(matcher -> Double.parseDouble(matcher.group(1)))
+                           .sum();
+            value += Stream.of(data)
+                           .filter(string -> string.contains("MINED" + address))
+                           .count();
+        }
+
+        return value;
+    }
+
+    private <T> T searchThroughChain(List<Block> chain, T defaultValue, Function<String, T> function) {
+        for (var block : chain) {
+            for (var row : block.getData()
+                                .split("\\n")) {
+                Optional<T> value = Optional.ofNullable(function.apply(row));
+                if (value.isPresent()) {
+                    return value.get();
+                }
+            }
+        }
+        return defaultValue;
     }
 }

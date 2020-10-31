@@ -9,6 +9,7 @@ import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.wallet.Wallet;
 import com.blackhearth.blockchain.wallet.WalletData;
 import com.blackhearth.blockchain.wallet.transaction.Transaction;
+import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,6 +29,7 @@ class MessageFactoryTest {
     private static BlockMiner blockMiner;
     private static BlockChainNode blockChainNode;
     private static BlockChainRepository blockChainRepository;
+    private static PeerToPeerRepository peerToPeerRepository;
     private static Wallet wallet;
 
     @BeforeAll
@@ -36,13 +38,14 @@ class MessageFactoryTest {
         blockChainNode = Mockito.mock(BlockChainNode.class);
         blockChainRepository = Mockito.mock(BlockChainRepository.class);
         wallet = Mockito.mock(Wallet.class);
+        peerToPeerRepository = Mockito.mock(PeerToPeerRepository.class);
 
-        messageFactory = new BasicMessageFactory(blockMiner, blockChainNode, blockChainRepository, wallet);
+        messageFactory = new BasicMessageFactory(blockMiner, blockChainNode, blockChainRepository, peerToPeerRepository, wallet);
     }
 
     @AfterEach
     public void reset() {
-        Mockito.reset(blockMiner, blockChainNode, blockChainRepository, wallet);
+        Mockito.reset(blockMiner, blockChainNode, blockChainRepository, peerToPeerRepository, wallet);
     }
 
     @Test
@@ -107,7 +110,7 @@ class MessageFactoryTest {
         ProtocolHeader header = ProtocolHeader.ADD_BLOCK;
 
         //when
-        Mockito.when(blockMiner.mineBlock()).thenReturn(block);
+        Mockito.when(blockMiner.lastMinedBlock()).thenReturn(block);
         Protocol protocol = messageFactory.generateMessages(header);
 
         //then
@@ -198,13 +201,7 @@ class MessageFactoryTest {
     void walletsResponse() throws
                            BlockChainNodeException {
         //given
-        WalletData walletData1 = new WalletData();
-        WalletData walletData2 = new WalletData();
-
-        walletData1.setAddress("address1");
-        walletData2.setAddress("address2");
-
-        List<WalletData> data = Arrays.asList(walletData1, walletData2);
+        List<String> data = Arrays.asList("address1", "address2");
 
         ProtocolHeader header = ProtocolHeader.WALLETS_RESPONSE;
 
@@ -242,7 +239,7 @@ class MessageFactoryTest {
         ProtocolHeader header = ProtocolHeader.NODES_RESPONSE;
 
         //when
-        Mockito.when(blockChainRepository.getNodes()).thenReturn(data);
+        Mockito.when(peerToPeerRepository.getNodes()).thenReturn(data);
         Protocol protocol = messageFactory.generateMessages(header);
 
         //then

@@ -10,11 +10,11 @@ import java.util.Optional;
 
 public interface BlockChainRepository {
     Optional<String> getCoinsFromAddress(String walletAddress);
-    List<Block> getBlocksFromPosition(int position, int blocks);
-    Optional<Integer> getPositionFromBlockHash(String hash);
+    List<Block> getChainToBlockHash(String hash);
     Optional<String> getPublicKeyFromAddress(String address);
-    List<WalletData> getWallets();
-
-    List<BlockChainNodeData> getNodes();
+    List<String> getWallets();
     void addToBlockChain(Block block);
+
+    String getLastBlockHash();
+
 }

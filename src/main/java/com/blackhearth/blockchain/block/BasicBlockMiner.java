@@ -1,24 +1,28 @@
 package com.blackhearth.blockchain.block;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class BasicBlockMiner implements BlockMiner {
 
+    private Block lastMinedBlock;
+    private final BlockBuilder blockBuilder;
+
     @Override
-    public Block mineBlock(String data, String previousHash, long timeStamp, int prefix) {
-        Block block = new Block(data, previousHash, timeStamp);
-        String prefixString = new String(new char[prefix]).replace('\0', '0');
-        while (!block.getHash().substring(0, prefix).equals(prefixString)) {
-            block.incrementNonce();
-            block.setHash(block.calculateBlockHash());
-        }
-        return block;
+    public Block lastMinedBlock() {
+        return lastMinedBlock;
     }
 
     @Override
-    public Block mineBlock() {
-        //mine Block without providing data;
-        return null;
+    public void startMining() {
+        Block builtBlock = blockBuilder.extractBlock();
+        String prefixString = new String(new char[5]).replace('\0', '0');
+        while (!builtBlock.getHash().substring(0, 5).equals(prefixString)) {
+            builtBlock.incrementNonce();
+            builtBlock.setHash(builtBlock.calculateBlockHash());
+        }
+        lastMinedBlock = builtBlock;
     }
 }
