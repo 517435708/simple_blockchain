@@ -92,6 +92,16 @@ public class BasicBlockChainRepository implements BlockChainRepository {
         getChainToBlockHash(block.getPreviousHash()).add(block);
     }
 
+    @Override
+    public String getLastBlockHash() {
+        var list = extractLongestChain();
+        if (list.isEmpty()) {
+            return "";
+        }
+        return list.get(list.size() - 1)
+                   .getHash();
+    }
+
     private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
         return searchThroughChain(longestChain, false, record -> {
             if (record.contains(NOTIFY_WALLET.getCode()) && record.contains(walletAddress)) {
@@ -103,6 +113,11 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     }
 
     private List<Block> extractLongestChain() {
+
+        if (blockChain.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         String hash = "";
         int maxSize = 0;
         for (var hashByChain : blockChain.entrySet()) {
@@ -136,6 +151,9 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                            .filter(Matcher::find)
                            .mapToDouble(matcher -> Double.parseDouble(matcher.group(1)))
                            .sum();
+            value += Stream.of(data)
+                           .filter(string -> string.contains("MINED" + address))
+                           .count();
         }
 
         return value;
