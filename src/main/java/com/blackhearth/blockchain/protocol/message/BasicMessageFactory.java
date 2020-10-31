@@ -133,7 +133,7 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateAddBlockMessage() {
-        Block block = blockMiner.mineBlock();
+        Block block = blockMiner.lastMinedBlock();
         AddBlockMessage addBlockMessage = new AddBlockMessage();
         addBlockMessage.setBlock(block);
         return addBlockMessage;

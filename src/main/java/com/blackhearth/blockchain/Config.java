@@ -3,7 +3,7 @@ package com.blackhearth.blockchain;
 import com.blackhearth.blockchain.block.BasicBlockMiner;
 import com.blackhearth.blockchain.block.BlockBuilder;
 import com.blackhearth.blockchain.block.BlockMiner;
-import com.blackhearth.blockchain.block.repository.BasicBlockBuiler;
+import com.blackhearth.blockchain.block.BasicBlockBuilder;
 import com.blackhearth.blockchain.validation.ChainValidator;
 import com.blackhearth.blockchain.validation.Validator;
 import com.blackhearth.blockchain.wallet.Wallet;
@@ -25,7 +25,7 @@ public class Config {
     Validator validator() { return new ChainValidator(); }
 
     @Bean
-    BlockBuilder blockBuilder() {return new BasicBlockBuiler(); }
+    BlockBuilder blockBuilder() {return new BasicBlockBuilder(); }
 
     @Bean
     BlockMiner blockMiner() { return new BasicBlockMiner(); }

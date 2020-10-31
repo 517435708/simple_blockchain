@@ -9,12 +9,10 @@ import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import com.blackhearth.blockchain.wallet.Transaction;
 import com.blackhearth.blockchain.wallet.Wallet;
-import com.blackhearth.blockchain.wallet.WalletData;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.security.PublicKey;
@@ -111,7 +109,7 @@ class MessageFactoryTest {
         ProtocolHeader header = ProtocolHeader.ADD_BLOCK;
 
         //when
-        Mockito.when(blockMiner.mineBlock()).thenReturn(block);
+        Mockito.when(blockMiner.lastMinedBlock()).thenReturn(block);
         Protocol protocol = messageFactory.generateMessages(header);
 
         //then

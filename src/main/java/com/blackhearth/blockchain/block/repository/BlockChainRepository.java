@@ -10,7 +10,6 @@ import java.util.Optional;
 
 public interface BlockChainRepository {
     Optional<String> getCoinsFromAddress(String walletAddress);
-    List<Block> getLongestChain();
     List<Block> getChainToBlockHash(String hash);
     Optional<String> getPublicKeyFromAddress(String address);
     List<String> getWallets();
