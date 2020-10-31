@@ -32,11 +32,6 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     }
 
     @Override
-    public List<Block> getLongestChain() {
-        return extractLongestChain();
-    }
-
-    @Override
     public List<Block> getChainToBlockHash(String hash) {
         for (var entry : blockChain.entrySet()) {
             List<Block> chain = entry.getValue();
