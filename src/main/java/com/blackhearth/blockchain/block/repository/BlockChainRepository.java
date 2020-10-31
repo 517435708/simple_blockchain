@@ -14,4 +14,7 @@ public interface BlockChainRepository {
     Optional<String> getPublicKeyFromAddress(String address);
     List<String> getWallets();
     void addToBlockChain(Block block);
+
+    String getLastBlockHash();
+
 }
