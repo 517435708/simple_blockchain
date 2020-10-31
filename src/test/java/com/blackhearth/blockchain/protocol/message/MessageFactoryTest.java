@@ -6,9 +6,10 @@ import com.blackhearth.blockchain.block.BlockMiner;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
-import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
-import com.blackhearth.blockchain.wallet.Transaction;
 import com.blackhearth.blockchain.wallet.Wallet;
+import com.blackhearth.blockchain.wallet.WalletData;
+import com.blackhearth.blockchain.wallet.transaction.Transaction;
+import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -126,14 +127,14 @@ class MessageFactoryTest {
         Transaction transaction = new Transaction();
         transaction.setAddress("adres");
         transaction.setAmount("12.12");
-        transaction.setSign("sign");
+        transaction.setSignature("sign");
         transaction.setTimeStamp(1337);
 
         TransactionMessage transactionMessage = new TransactionMessage();
         transactionMessage.setSenderAddress(hash);
         transactionMessage.setAmountOfCoinTransferred(transaction.getAmount());
         transactionMessage.setReceiverAddress(transaction.getAddress());
-        transactionMessage.setDigitalSignature(transaction.getSign());
+        transactionMessage.setDigitalSignature(transaction.getSignature());
         transactionMessage.setTimeStamp(transaction.getTimeStamp());
 
         ProtocolHeader header = ProtocolHeader.TRANSACTION;

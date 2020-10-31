@@ -6,9 +6,10 @@ import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
-import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
-import com.blackhearth.blockchain.wallet.Transaction;
 import com.blackhearth.blockchain.wallet.Wallet;
+import com.blackhearth.blockchain.wallet.WalletData;
+import com.blackhearth.blockchain.wallet.transaction.Transaction;
+import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -127,7 +128,7 @@ public class BasicMessageFactory implements MessageFactory {
         Transaction transaction = wallet.getLastTransaction();
         transactionMessage.setAmountOfCoinTransferred(transaction.getAmount());
         transactionMessage.setReceiverAddress(transaction.getAddress());
-        transactionMessage.setDigitalSignature(transaction.getSign());
+        transactionMessage.setDigitalSignature(transaction.getSignature());
         transactionMessage.setTimeStamp(transaction.getTimeStamp());
         return transactionMessage;
     }
