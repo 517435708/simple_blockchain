@@ -3,6 +3,7 @@ package com.blackhearth.blockchain;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.paramsreader.ParamsReader;
 import com.blackhearth.blockchain.paramsreader.RunParams;
+import com.blackhearth.blockchain.peertopeer.HostInfo;
 import lombok.SneakyThrows;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,13 +18,9 @@ public class SimpleBlockchainApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext run = SpringApplication.run(SimpleBlockchainApplication.class, args);
 		Map<RunParams, Object> params = ParamsReader.getParams(args);
+		String firstKnownHost = String.valueOf(params.getOrDefault(RunParams.FIRST_KNOWN, null));
 
 		BlockChainNode blockChainNode = (BlockChainNode) run.getBean("blockChainNode");
-		blockChainNode.start();
-
-//		BasicPeerToPeerService basicPeerToPeerService = new BasicPeerToPeerService(new InterpreterBlockChainCommunication());
-//		basicPeerToPeerService.start(1234);
-
-//		System.out.println(basicPeerToPeerService.getLocalBlockChainNodeData());
+		blockChainNode.start(HostInfo.from(firstKnownHost));
 	}
 }

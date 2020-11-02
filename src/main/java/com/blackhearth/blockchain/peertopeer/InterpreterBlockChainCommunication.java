@@ -6,9 +6,13 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,17 +21,18 @@ import java.util.Set;
 @Component
 public class InterpreterBlockChainCommunication implements BlockChainCommunication {
     private static final int CONNECTION_TIMEOUT = 5000;
-    private Server server;
-    private Client client;
     private Set<HostInfo> knownHosts = new HashSet<>();
 
-    // TODO: 21.10.2020 initialize
-    private ProtocolInterpreter interpreter;
+    private final Server server;
+    private final Client client;
+    private final ProtocolInterpreter interpreter;
 
-    public InterpreterBlockChainCommunication() {
-        this.server = new Server();
-        this.client = new Client();
-        registerCommunicationClass();
+    public InterpreterBlockChainCommunication(Server server,
+                                              Client client,
+                                              @Lazy ProtocolInterpreter interpreter) {
+        this.server = server;
+        this.client = client;
+        this.interpreter = interpreter;
     }
 
     @Override
@@ -58,7 +63,9 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
         client.close();
     }
 
+    @PostConstruct
     private void registerCommunicationClass() {
+        log.info("Registered communictaion class");
         Kryo serverKryo = server.getKryo();
         serverKryo.register(CommunicationObject.class);
 

@@ -12,13 +12,14 @@ import com.blackhearth.blockchain.wallet.transaction.Transaction;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 
 @Component
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class BasicMessageFactory implements MessageFactory {
 
     private final BlockMiner blockMiner;
@@ -27,6 +28,17 @@ public class BasicMessageFactory implements MessageFactory {
     private final PeerToPeerRepository peerToPeerRepository;
     private final Wallet wallet;
 
+    public BasicMessageFactory(BlockMiner blockMiner,
+                               @Lazy BlockChainNode blockChainNode,
+                               BlockChainRepository blockChainRepository,
+                               PeerToPeerRepository peerToPeerRepository, Wallet wallet) {
+        this.blockMiner = blockMiner;
+        this.blockChainNode = blockChainNode;
+        this.blockChainRepository = blockChainRepository;
+        this.peerToPeerRepository = peerToPeerRepository;
+        this.wallet = wallet;
+    }
+
     @Override
     public Protocol generateMessages(ProtocolHeader header, String walletAddress) throws
                                                                                   BlockChainNodeException {
@@ -34,7 +46,7 @@ public class BasicMessageFactory implements MessageFactory {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
             case NOTIFY_WALLET:
-                return generateNotifyWalletMessage();
+//                return generateNotifyWalletMessage();
             case ADD_BLOCK:
                 return generateAddBlockMessage();
             case TRANSACTION:
@@ -63,7 +75,7 @@ public class BasicMessageFactory implements MessageFactory {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
             case NOTIFY_WALLET:
-                return generateNotifyWalletMessage();
+//                return generateNotifyWalletMessage();
             case ADD_BLOCK:
                 return generateAddBlockMessage();
             case TRANSACTION:
@@ -154,7 +166,7 @@ public class BasicMessageFactory implements MessageFactory {
 
 
         NotifyNodeMessage notifyNodeMessage = new NotifyNodeMessage();
-        BlockChainNodeData data = blockChainNode.start();
+        BlockChainNodeData data = blockChainNode.composeData();
 
         notifyNodeMessage.setBlockChainNode(data);
         return notifyNodeMessage;

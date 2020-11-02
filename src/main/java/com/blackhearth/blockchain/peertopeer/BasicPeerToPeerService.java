@@ -3,11 +3,13 @@ package com.blackhearth.blockchain.peertopeer;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BasicPeerToPeerService implements PeerToPeerService {
@@ -23,7 +25,13 @@ public class BasicPeerToPeerService implements PeerToPeerService {
     @SneakyThrows
     @Override
     public void sendMessageTo(String message, String address, String port) {
+        log.info("Sending msg: {} to {}:{}", message, address, port);
         communication.sendTo(message, address, Integer.parseInt(port));
+    }
+
+    @Override
+    public void sendMessageTo(String message, HostInfo hostInfo) {
+        sendMessageTo(message, hostInfo.getAddress(), String.valueOf(hostInfo.getPort()));
     }
 
     @Override
