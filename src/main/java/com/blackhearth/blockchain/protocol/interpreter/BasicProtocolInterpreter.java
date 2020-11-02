@@ -158,6 +158,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     }
 
     private void notifyNode(String value) {
+        log.info("NotifyNode with value: {}", value);
         peerToPeerRepository.saveNode(new Gson().fromJson(value, BlockChainNodeData.class));
     }
 }

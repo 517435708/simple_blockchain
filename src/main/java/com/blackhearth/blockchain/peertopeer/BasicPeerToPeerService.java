@@ -37,7 +37,7 @@ public class BasicPeerToPeerService implements PeerToPeerService {
     @Override
     public void sendMessageToAllKnownNodes(String message) {
         communication.getAllKnownHosts()
-                .forEach(host -> sendMessageTo(message, host.getAddress(), String.valueOf(host.getPort())));
+                .forEach(host -> sendMessageTo(message, host.getIp(), String.valueOf(host.getPort())));
     }
 
     @Override

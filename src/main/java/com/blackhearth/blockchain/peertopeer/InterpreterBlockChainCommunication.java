@@ -1,38 +1,38 @@
 package com.blackhearth.blockchain.peertopeer;
 
+import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.protocol.interpreter.ProtocolInterpreter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
 @Component
 public class InterpreterBlockChainCommunication implements BlockChainCommunication {
     private static final int CONNECTION_TIMEOUT = 5000;
-    private Set<HostInfo> knownHosts = new HashSet<>();
 
     private final Server server;
     private final Client client;
     private final ProtocolInterpreter interpreter;
+    private final BasicPeerToPeerRepository repository;
 
     public InterpreterBlockChainCommunication(Server server,
                                               Client client,
-                                              @Lazy ProtocolInterpreter interpreter) {
+                                              @Lazy ProtocolInterpreter interpreter,
+                                              BasicPeerToPeerRepository repository) {
         this.server = server;
         this.client = client;
         this.interpreter = interpreter;
+        this.repository = repository;
     }
 
     @Override
@@ -53,8 +53,8 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     }
 
     @Override
-    public Set<HostInfo> getAllKnownHosts() {
-        return knownHosts;
+    public Set<BlockChainNodeData> getAllKnownHosts() {
+        return repository.getNodes();
     }
 
     @Override
@@ -95,7 +95,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     }
 
     private void addToKnownHosts(String host, int port) {
-        knownHosts.add(new HostInfo(host, port));
+        repository.saveNode(new BlockChainNodeData(port, host));
     }
 }
 

@@ -6,16 +6,16 @@ import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
-import com.blackhearth.blockchain.wallet.Wallet;
-import com.blackhearth.blockchain.wallet.WalletData;
-import com.blackhearth.blockchain.wallet.transaction.Transaction;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
-import lombok.RequiredArgsConstructor;
+import com.blackhearth.blockchain.wallet.Wallet;
+import com.blackhearth.blockchain.wallet.transaction.Transaction;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Component
@@ -96,9 +96,9 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateNodesResponseMessage() {
-        List<BlockChainNodeData> data = peerToPeerRepository.getNodes();
+        Set<BlockChainNodeData> data = peerToPeerRepository.getNodes();
         NodesResponseMessage nodesResponseMessage = new NodesResponseMessage();
-        nodesResponseMessage.setNodes(data);
+        nodesResponseMessage.setNodes(new ArrayList<>(data));
         return nodesResponseMessage;
     }
 
