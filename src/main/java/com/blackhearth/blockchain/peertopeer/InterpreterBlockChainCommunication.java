@@ -44,7 +44,6 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
 
     @Override
     public void sendTo(String message, String host, int port) throws IOException {
-        addToKnownHosts(host, port);
         client.start();
         client.connect(CONNECTION_TIMEOUT, host, port);
         client.sendTCP(new CommunicationObject(message));
@@ -88,14 +87,9 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
         String hostAddress = connection.getRemoteAddressTCP().getAddress().getHostAddress();
         String port = String.valueOf(connection.getRemoteAddressTCP().getPort());
         String text = object.getText();
-        addToKnownHosts(hostAddress, Integer.parseInt(port));
 
         log.info("Interpreting: {} from {}:{}", text, hostAddress, port);
         interpreter.interpretMessage(text, hostAddress, port);
-    }
-
-    private void addToKnownHosts(String host, int port) {
-        repository.saveNode(new BlockChainNodeData(port, host));
     }
 }
 

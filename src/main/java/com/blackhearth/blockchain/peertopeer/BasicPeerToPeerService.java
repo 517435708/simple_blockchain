@@ -29,6 +29,7 @@ public class BasicPeerToPeerService implements PeerToPeerService {
             log.info("Sending msg: {} to {}:{}", message, address, port);
             communication.sendTo(message, address, Integer.parseInt(port));
         }catch (Exception e){
+            e.printStackTrace();
             log.error("Failed to send msg: {} to {}:{}", message, address, port);
         }
     }
