@@ -65,9 +65,11 @@ public class BlockChainNode {
             return;
         }
 
-        String message = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE)
-                                 .generateMessage();
-        p2pService.sendMessageTo(message, firstKnownHost);
+        String notifyNodeMessage = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE).generateMessage();
+        p2pService.sendMessageTo(notifyNodeMessage, firstKnownHost);
+
+        String requestNodesMessage = messageFactory.generateMessages(ProtocolHeader.NODES_REQUEST).generateMessage();
+        p2pService.sendMessageTo(requestNodesMessage, firstKnownHost);
     }
 
     private int discoverPort() throws BlockChainNodeException {
