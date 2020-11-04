@@ -19,6 +19,7 @@ import java.util.Set;
 @Component
 public class InterpreterBlockChainCommunication implements BlockChainCommunication {
     private static final int CONNECTION_TIMEOUT = 5000;
+    private static final int PRINT_ALL_NODES_SEQUENCE_MS = 5000;
 
     private final Server server;
     private final Client client;
@@ -102,7 +103,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
                 repository.getNodes();
 
                 try {
-                    Thread.sleep(1500);
+                    Thread.sleep(PRINT_ALL_NODES_SEQUENCE_MS);
                 } catch (InterruptedException e) {
                     log.error(e.getMessage());
                 }
