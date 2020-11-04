@@ -29,12 +29,12 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.*;
 public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     private final BlockChainRepository blockChainRepository;
-    private final PeerToPeerRepository peerToPeerRepository;
+    private final PeerToPeerRepository p2pRepository;
     private final Validator validator;
     private final BlockBuilder blockBuilder;
     private final MessageFactory messageFactory;
 
-    private final PeerToPeerService peerToPeerService;
+    private final PeerToPeerService p2pService;
 
     @Override
     public void interpretMessage(String message, String senderAddress, String senderPort) {
@@ -86,17 +86,17 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     private void nodesResponse(String value) {
         BlockChainNodeData[] nodes = new Gson().fromJson(value, BlockChainNodeData[].class);
         for (var node : nodes) {
-            peerToPeerRepository.saveNode(node);
+            p2pRepository.saveNode(node);
         }
 
-        String notifyAll = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE).generateMessage();
-        peerToPeerService.sendMessageToAllKnownNodes(notifyAll);
+        String notifyNodeMessage = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE).generateMessage();
+        p2pService.sendMessageToAllKnownNodes(notifyNodeMessage);
     }
 
     private void nodesRequest(String address, String port) {
         try {
             Protocol protocol = messageFactory.generateMessages(NODES_RESPONSE);
-            peerToPeerService.sendMessageTo(protocol.generateMessage(), address, port);
+            p2pService.sendMessageTo(protocol.generateMessage(), address, port);
         } catch (BlockChainNodeException e) {
             log.error(String.valueOf(e));
         }
@@ -104,13 +104,13 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     private void walletsResponse(String value) {
         String[] wallets = value.split("\\|");
-        peerToPeerRepository.saveWalletsAddresses(wallets);
+        p2pRepository.saveWalletsAddresses(wallets);
     }
 
     private void walletsRequest(String address, String port) {
         try {
             Protocol protocol = messageFactory.generateMessages(WALLETS_RESPONSE);
-            peerToPeerService.sendMessageTo(protocol.generateMessage(), address, port);
+            p2pService.sendMessageTo(protocol.generateMessage(), address, port);
         } catch (BlockChainNodeException e) {
             log.error(String.valueOf(e));
         }
@@ -123,14 +123,14 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
         walletData.setPublicKey(args[1]);
         walletData.setAddress(args[2]);
         if (!(args[0].equals("") || args[1].equals("") || args[2].equals(""))) {
-            peerToPeerRepository.saveWalletData(walletData);
+            p2pRepository.saveWalletData(walletData);
         }
     }
 
     private void walletDataRequest(String walletAddress, String address, String port) {
         try {
             Protocol protocol = messageFactory.generateMessages(WALLET_DATA_RESPONSE, walletAddress);
-            peerToPeerService.sendMessageTo(protocol.generateMessage(), address, port);
+            p2pService.sendMessageTo(protocol.generateMessage(), address, port);
         } catch (BlockChainNodeException ex) {
             log.error(String.valueOf(ex));
         }
@@ -164,6 +164,6 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     private void notifyNode(String value) {
         log.info("NotifyNode with value: {}", value);
-        peerToPeerRepository.saveNode(new Gson().fromJson(value, BlockChainNodeData.class));
+        p2pRepository.saveNode(new Gson().fromJson(value, BlockChainNodeData.class));
     }
 }

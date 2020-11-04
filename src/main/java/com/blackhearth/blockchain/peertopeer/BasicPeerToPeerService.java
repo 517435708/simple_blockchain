@@ -14,6 +14,7 @@ import java.net.InetAddress;
 @RequiredArgsConstructor
 public class BasicPeerToPeerService implements PeerToPeerService {
     private final BlockChainCommunication communication;
+    private final PeerToPeerRepository p2pRepository;
     private int tcpPort = 0;
 
     @Override
@@ -31,6 +32,7 @@ public class BasicPeerToPeerService implements PeerToPeerService {
         }catch (Exception e){
             e.printStackTrace();
             log.error("Failed to send msg: {} to {}:{}", message, address, port);
+            p2pRepository.deleteNode(new BlockChainNodeData(Integer.parseInt(port), address));
         }
     }
 
@@ -41,8 +43,10 @@ public class BasicPeerToPeerService implements PeerToPeerService {
 
     @Override
     public void sendMessageToAllKnownNodes(String message) {
-        communication.getAllKnownHosts()
-                .forEach(host -> sendMessageTo(message, host.getIp(), String.valueOf(host.getPort())));
+        new Thread(() -> {
+            communication.getAllKnownHosts()
+                         .forEach(host -> sendMessageTo(message, host.getIp(), String.valueOf(host.getPort())));
+        }).start();
     }
 
     @Override

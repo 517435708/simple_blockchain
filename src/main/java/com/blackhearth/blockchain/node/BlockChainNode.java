@@ -1,5 +1,6 @@
 package com.blackhearth.blockchain.node;
 
+import com.blackhearth.blockchain.peertopeer.BasicPeerToPeerRepository;
 import com.blackhearth.blockchain.peertopeer.HostInfo;
 import com.blackhearth.blockchain.peertopeer.IpUtils;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerService;
@@ -22,6 +23,7 @@ public class BlockChainNode {
     private final PeerToPeerService p2pService;
     private final Random random;
     private final BasicMessageFactory messageFactory;
+    private final BasicPeerToPeerRepository p2pRepository;
 
     private boolean isNodeRunning = false;
 
@@ -49,6 +51,7 @@ public class BlockChainNode {
 
     private void runNode() throws IOException {
         p2pService.start(port);
+        p2pRepository.saveNode(new BlockChainNodeData(port, IpUtils.getLocalHostLANAddress().getHostAddress()));
         log.info("BlockChain started on TCP port {}", port);
     }
 
@@ -65,9 +68,6 @@ public class BlockChainNode {
         if (firstKnownHost == null) {
             return;
         }
-
-        String notifyNodeMessage = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE).generateMessage();
-        p2pService.sendMessageTo(notifyNodeMessage, firstKnownHost);
 
         String requestNodesMessage = messageFactory.generateMessages(ProtocolHeader.NODES_REQUEST).generateMessage();
         p2pService.sendMessageTo(requestNodesMessage, firstKnownHost);

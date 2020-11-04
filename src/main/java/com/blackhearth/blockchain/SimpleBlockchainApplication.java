@@ -18,9 +18,9 @@ public class SimpleBlockchainApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext run = SpringApplication.run(SimpleBlockchainApplication.class, args);
 		Map<RunParams, Object> params = ParamsReader.getParams(args);
-		String firstKnownHost = String.valueOf(params.getOrDefault(RunParams.FIRST_KNOWN, null));
+		String firstKnownHost = String.valueOf(params.getOrDefault(RunParams.FIRST_KNOWN, "localhost:54449"));
 
-		BlockChainNode blockChainNode = (BlockChainNode) run.getBean("blockChainNode");
+		BlockChainNode blockChainNode = run.getBean("blockChainNode", BlockChainNode.class);
 		blockChainNode.start(HostInfo.from(firstKnownHost));
 	}
 }

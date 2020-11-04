@@ -26,6 +26,12 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
     }
 
     @Override
+    public void deleteNode(BlockChainNodeData data) {
+        log.info("Deleting node {}:{}", data.getIp(), data.getPort());
+        knownNodes.remove(data);
+    }
+
+    @Override
     public void saveWalletData(WalletData walletData) {
 
     }
