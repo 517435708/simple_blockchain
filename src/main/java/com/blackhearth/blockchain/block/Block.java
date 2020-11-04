@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
-import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

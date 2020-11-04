@@ -104,7 +104,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
                 try {
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
             }
         }).start();

@@ -33,11 +33,11 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
 
     @Override
     public void saveWalletData(WalletData walletData) {
-
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override
     public void saveWalletsAddresses(String[] addresses) {
-
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 }

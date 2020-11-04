@@ -30,8 +30,8 @@ public class BasicPeerToPeerService implements PeerToPeerService {
             log.info("Sending msg: {} to {}:{}", message, address, port);
             communication.sendTo(message, address, Integer.parseInt(port));
         }catch (Exception e){
-            e.printStackTrace();
             log.error("Failed to send msg: {} to {}:{}", message, address, port);
+            log.error(e.getMessage());
             p2pRepository.deleteNode(new BlockChainNodeData(Integer.parseInt(port), address));
         }
     }
@@ -43,10 +43,10 @@ public class BasicPeerToPeerService implements PeerToPeerService {
 
     @Override
     public void sendMessageToAllKnownNodes(String message) {
-        new Thread(() -> {
-            communication.getAllKnownHosts()
-                         .forEach(host -> sendMessageTo(message, host.getIp(), String.valueOf(host.getPort())));
-        }).start();
+        new Thread(() -> communication
+                .getAllKnownHosts()
+                .forEach(host -> sendMessageTo(message, host.getIp(), String.valueOf(host.getPort()))))
+                .start();
     }
 
     @Override

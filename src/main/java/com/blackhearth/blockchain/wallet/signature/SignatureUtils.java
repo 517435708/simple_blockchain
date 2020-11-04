@@ -1,6 +1,7 @@
 package com.blackhearth.blockchain.wallet.signature;
 
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -11,6 +12,7 @@ import java.util.Base64;
 import static lombok.AccessLevel.PRIVATE;
 
 @NoArgsConstructor(access = PRIVATE)
+@Slf4j
 public class SignatureUtils {
 
     public static String getStringFromKey(Key key) {
@@ -25,7 +27,7 @@ public class SignatureUtils {
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             byteArrayToHexString(hexString, hash);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         return hexString.toString();
 

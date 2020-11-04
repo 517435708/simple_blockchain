@@ -36,8 +36,8 @@ public class BlockChainNode {
         if (!isNodeRunning) {
             port = discoverPort();
             runNode();
-//            runMiner();
-//            createWallet();
+//            runMiner(); // TODO: 2020-11-04  
+//            createWallet(); // TODO: 2020-11-04  
             sendRequestToFirstKnownHost(firstKnown);
             isNodeRunning = true;
         }
@@ -56,10 +56,12 @@ public class BlockChainNode {
     }
 
     private void runMiner() {
+        // TODO: 2020-11-04  
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     private void createWallet() {
+        // TODO: 2020-11-04  
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
@@ -76,11 +78,11 @@ public class BlockChainNode {
     private int discoverPort() throws BlockChainNodeException {
         int tryNumber = 0;
         do {
-            int port = random.ints(1, 49152, 65535)
+            int randomServerPort = random.ints(1, 49152, 65535)
                     .sum();
 
-            if (IpUtils.isPortAvailable(port)) {
-                return port;
+            if (IpUtils.isPortAvailable(randomServerPort)) {
+                return randomServerPort;
             }
 
             tryNumber++;
