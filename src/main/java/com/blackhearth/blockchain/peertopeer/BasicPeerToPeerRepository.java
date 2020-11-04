@@ -11,11 +11,11 @@ import java.util.Set;
 @Repository
 @Slf4j
 public class BasicPeerToPeerRepository implements PeerToPeerRepository {
-    private static Set<BlockChainNodeData> knownNodes = new HashSet<>();
+    private Set<BlockChainNodeData> knownNodes = new HashSet<>();
 
     @Override
     public Set<BlockChainNodeData> getNodes() {
-        log.info("Known hosts are: {}", knownNodes.toArray());
+        log.info("Known hosts are: {}", knownNodes);
         return knownNodes;
     }
 

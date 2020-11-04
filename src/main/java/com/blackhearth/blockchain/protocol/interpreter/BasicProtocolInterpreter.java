@@ -15,6 +15,7 @@ import com.blackhearth.blockchain.validation.Validator;
 import com.blackhearth.blockchain.wallet.WalletData;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -81,11 +82,15 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
         }
     }
 
+    @SneakyThrows
     private void nodesResponse(String value) {
         BlockChainNodeData[] nodes = new Gson().fromJson(value, BlockChainNodeData[].class);
         for (var node : nodes) {
             peerToPeerRepository.saveNode(node);
         }
+
+        String notifyAll = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE).generateMessage();
+        peerToPeerService.sendMessageToAllKnownNodes(notifyAll);
     }
 
     private void nodesRequest(String address, String port) {
