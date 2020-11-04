@@ -25,8 +25,6 @@ public class SocketServerExample {
             if (randomNum < 5) {
                 serverTest.send("Dupa", receiverHost, receiverPort);
             }
-
-
         }
     }
 

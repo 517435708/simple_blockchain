@@ -24,6 +24,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     private final Client client;
     private final ProtocolInterpreter interpreter;
     private final BasicPeerToPeerRepository repository;
+    private HostInfo serverInfo;
 
     public InterpreterBlockChainCommunication(Server server,
                                               Client client,
@@ -39,6 +40,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     public void start(int tcpPort) throws IOException {
         server.start();
         server.bind(tcpPort);
+        serverInfo = new HostInfo(IpUtils.getLocalHostLANAddress().getHostAddress(), tcpPort);
         initializeInterpreter();
     }
 
@@ -46,7 +48,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     public void sendTo(String message, String host, int port) throws IOException {
         client.start();
         client.connect(CONNECTION_TIMEOUT, host, port);
-        client.sendTCP(new CommunicationObject(message));
+        client.sendTCP(new CommunicationObject(message, serverInfo));
 
         client.close();
     }
@@ -85,7 +87,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
 
     private void delegateToInterpretMessage(Connection connection, CommunicationObject object) {
         String hostAddress = connection.getRemoteAddressTCP().getAddress().getHostAddress();
-        String port = String.valueOf(connection.getRemoteAddressTCP().getPort());
+        String port = String.valueOf(object.getSenderInfo().getPort());
         String text = object.getText();
 
         log.info("Interpreting: {} from {}:{}", text, hostAddress, port);
