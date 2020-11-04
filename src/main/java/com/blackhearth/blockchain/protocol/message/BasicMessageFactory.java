@@ -46,7 +46,7 @@ public class BasicMessageFactory implements MessageFactory {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
             case NOTIFY_WALLET:
-//                return generateNotifyWalletMessage();
+                return generateNotifyWalletMessage();
             case ADD_BLOCK:
                 return generateAddBlockMessage();
             case TRANSACTION:
@@ -75,7 +75,7 @@ public class BasicMessageFactory implements MessageFactory {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
             case NOTIFY_WALLET:
-//                return generateNotifyWalletMessage();
+                return generateNotifyWalletMessage();
             case ADD_BLOCK:
                 return generateAddBlockMessage();
             case TRANSACTION:
@@ -163,8 +163,6 @@ public class BasicMessageFactory implements MessageFactory {
     @SneakyThrows
     private Protocol generateNotifyNodeMessage() throws
                                                  BlockChainNodeException {
-
-
         NotifyNodeMessage notifyNodeMessage = new NotifyNodeMessage();
         BlockChainNodeData data = blockChainNode.composeData();
 
