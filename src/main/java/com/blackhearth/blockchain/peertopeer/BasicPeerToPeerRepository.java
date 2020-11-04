@@ -11,7 +11,7 @@ import java.util.Set;
 @Repository
 @Slf4j
 public class BasicPeerToPeerRepository implements PeerToPeerRepository {
-    private Set<BlockChainNodeData> knownNodes = new HashSet<>();
+    private static Set<BlockChainNodeData> knownNodes = new HashSet<>();
 
     @Override
     public Set<BlockChainNodeData> getNodes() {
