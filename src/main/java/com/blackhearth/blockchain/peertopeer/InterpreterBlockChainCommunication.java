@@ -24,7 +24,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     private final Client client;
     private final ProtocolInterpreter interpreter;
     private final BasicPeerToPeerRepository repository;
-    private int port;
+    private int serverPort;
 
     public InterpreterBlockChainCommunication(Server server,
                                               Client client,
@@ -40,7 +40,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     public void start(int tcpPort) throws IOException {
         server.start();
         server.bind(tcpPort);
-        this.port = tcpPort;
+        this.serverPort = tcpPort;
         initializeInterpreter();
     }
 
@@ -48,7 +48,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     public void sendTo(String message, String host, int port) throws IOException {
         client.start();
         client.connect(CONNECTION_TIMEOUT, host, port);
-        client.sendTCP(new CommunicationObject(message, port));
+        client.sendTCP(new CommunicationObject(message, serverPort));
 
         client.close();
     }
