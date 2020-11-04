@@ -39,6 +39,7 @@ public class BlockChainNode {
             sendRequestToFirstKnownHost(firstKnown);
             isNodeRunning = true;
         }
+
         return composeData();
     }
 

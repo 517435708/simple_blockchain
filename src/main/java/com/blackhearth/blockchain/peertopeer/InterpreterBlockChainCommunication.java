@@ -42,6 +42,8 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
         server.bind(tcpPort);
         this.serverPort = tcpPort;
         initializeInterpreter();
+
+        printInfoAboutKnownHosts();
     }
 
     @Override
@@ -92,6 +94,20 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
 
         log.info("Interpreting: {} from {}:{}", text, hostAddress, port);
         interpreter.interpretMessage(text, hostAddress, port);
+    }
+
+    private void printInfoAboutKnownHosts() {
+        new Thread(() -> {
+            while (true) {
+                repository.getNodes();
+
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }
 
