@@ -6,19 +6,19 @@ import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.node.BlockChainNodeException;
-import com.blackhearth.blockchain.wallet.Wallet;
-import com.blackhearth.blockchain.wallet.WalletData;
-import com.blackhearth.blockchain.wallet.transaction.Transaction;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
-import lombok.RequiredArgsConstructor;
+import com.blackhearth.blockchain.wallet.Wallet;
+import com.blackhearth.blockchain.wallet.transaction.Transaction;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 @Component
-@RequiredArgsConstructor
 public class BasicMessageFactory implements MessageFactory {
 
     private final BlockMiner blockMiner;
@@ -26,6 +26,17 @@ public class BasicMessageFactory implements MessageFactory {
     private final BlockChainRepository blockChainRepository;
     private final PeerToPeerRepository peerToPeerRepository;
     private final Wallet wallet;
+
+    public BasicMessageFactory(BlockMiner blockMiner,
+                               @Lazy BlockChainNode blockChainNode,
+                               BlockChainRepository blockChainRepository,
+                               PeerToPeerRepository peerToPeerRepository, Wallet wallet) {
+        this.blockMiner = blockMiner;
+        this.blockChainNode = blockChainNode;
+        this.blockChainRepository = blockChainRepository;
+        this.peerToPeerRepository = peerToPeerRepository;
+        this.wallet = wallet;
+    }
 
     @Override
     public Protocol generateMessages(ProtocolHeader header, String walletAddress) throws
@@ -84,9 +95,9 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateNodesResponseMessage() {
-        List<BlockChainNodeData> data = peerToPeerRepository.getNodes();
+        Set<BlockChainNodeData> data = peerToPeerRepository.getNodes();
         NodesResponseMessage nodesResponseMessage = new NodesResponseMessage();
-        nodesResponseMessage.setNodes(data);
+        nodesResponseMessage.setNodes(new ArrayList<>(data));
         return nodesResponseMessage;
     }
 
@@ -151,10 +162,8 @@ public class BasicMessageFactory implements MessageFactory {
     @SneakyThrows
     private Protocol generateNotifyNodeMessage() throws
                                                  BlockChainNodeException {
-
-
         NotifyNodeMessage notifyNodeMessage = new NotifyNodeMessage();
-        BlockChainNodeData data = blockChainNode.start();
+        BlockChainNodeData data = blockChainNode.composeData();
 
         notifyNodeMessage.setBlockChainNode(data);
         return notifyNodeMessage;

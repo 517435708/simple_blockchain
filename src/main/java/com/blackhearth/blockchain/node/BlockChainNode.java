@@ -1,7 +1,11 @@
 package com.blackhearth.blockchain.node;
 
+import com.blackhearth.blockchain.peertopeer.BasicPeerToPeerRepository;
+import com.blackhearth.blockchain.peertopeer.HostInfo;
 import com.blackhearth.blockchain.peertopeer.IpUtils;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerService;
+import com.blackhearth.blockchain.protocol.message.BasicMessageFactory;
+import com.blackhearth.blockchain.protocol.message.ProtocolHeader;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -18,6 +22,8 @@ import java.util.Random;
 public class BlockChainNode {
     private final PeerToPeerService p2pService;
     private final Random random;
+    private final BasicMessageFactory messageFactory;
+    private final BasicPeerToPeerRepository p2pRepository;
 
     private boolean isNodeRunning = false;
 
@@ -25,35 +31,58 @@ public class BlockChainNode {
     private int port;
 
     @SneakyThrows(IOException.class)
-    public BlockChainNodeData start() throws
+    public BlockChainNodeData start(HostInfo firstKnown) throws
             BlockChainNodeException {
         if (!isNodeRunning) {
             port = discoverPort();
             runNode();
+//            runMiner(); // TODO: 2020-11-04  
+//            createWallet(); // TODO: 2020-11-04  
+            sendRequestToFirstKnownHost(firstKnown);
             isNodeRunning = true;
         }
+
         return composeData();
     }
 
-    private BlockChainNodeData composeData() {
+    public BlockChainNodeData composeData() {
         return p2pService.getLocalBlockChainNodeData();
     }
 
     private void runNode() throws IOException {
         p2pService.start(port);
+        p2pRepository.saveNode(new BlockChainNodeData(port, IpUtils.getLocalHostLANAddress().getHostAddress()));
         log.info("BlockChain started on TCP port {}", port);
-        //stuff
     }
 
-    private int discoverPort() throws
-            BlockChainNodeException {
+    private void runMiner() {
+        // TODO: 2020-11-04  
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    private void createWallet() {
+        // TODO: 2020-11-04  
+        throw new UnsupportedOperationException("Not implemented yet.");
+    }
+
+    @SneakyThrows
+    private void sendRequestToFirstKnownHost(HostInfo firstKnownHost) {
+        if (firstKnownHost == null) {
+            return;
+        }
+
+        String requestNodesMessage = messageFactory.generateMessages(ProtocolHeader.NODES_REQUEST).generateMessage();
+        p2pService.sendMessageTo(requestNodesMessage, firstKnownHost);
+    }
+
+    private int discoverPort() throws BlockChainNodeException {
         int tryNumber = 0;
         do {
-            int port = random.ints(1, 49152, 65535)
+            int randomServerPort = random.ints(1, 49152, 65535)
                     .sum();
 
-            if (IpUtils.isPortAvailable(port)) {
-                return port;
+            if (IpUtils.isPortAvailable(randomServerPort)) {
+                return randomServerPort;
             }
 
             tryNumber++;

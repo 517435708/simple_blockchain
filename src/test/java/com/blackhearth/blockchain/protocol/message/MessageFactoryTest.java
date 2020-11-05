@@ -56,7 +56,7 @@ class MessageFactoryTest {
         ProtocolHeader header = ProtocolHeader.NOTIFY_NODE;
 
         //when
-        Mockito.when(blockChainNode.start()).thenReturn(blockChainNodeData);
+        Mockito.when(blockChainNode.start(null)).thenReturn(blockChainNodeData);
         Protocol protocol = messageFactory.generateMessages(header);
 
         //then

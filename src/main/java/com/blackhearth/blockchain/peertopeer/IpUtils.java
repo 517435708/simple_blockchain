@@ -67,6 +67,7 @@ public class IpUtils {
      * Też ze stacka:
      * https://stackoverflow.com/questions/434718/sockets-discover-port-availability-using-java
      */
+    @SuppressWarnings("all")
     public static boolean isPortAvailable(int port) {
         ServerSocket ss = null;
         DatagramSocket ds = null;
