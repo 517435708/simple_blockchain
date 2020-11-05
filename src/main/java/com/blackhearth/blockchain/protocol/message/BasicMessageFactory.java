@@ -19,7 +19,6 @@ import java.util.Set;
 
 
 @Component
-//@RequiredArgsConstructor
 public class BasicMessageFactory implements MessageFactory {
 
     private final BlockMiner blockMiner;

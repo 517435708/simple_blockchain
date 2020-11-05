@@ -41,7 +41,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
     public void start(int tcpPort) throws IOException {
         server.start();
         server.bind(tcpPort);
-        this.serverPort = tcpPort;
+        serverPort = tcpPort;
         initializeInterpreter();
 
         printInfoAboutKnownHosts();
