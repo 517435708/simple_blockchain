@@ -17,7 +17,7 @@ class WalletTransactionBuilderTest {
     private static Wallet walletB;
     private static Transaction transaction;
     private static BasicTransactionService basicTransactionFactory;
-    private static BasicWalletService basicWalletFactory;
+    private static SignatureGenerator basicWalletFactory;
 
 
     @BeforeAll
@@ -25,7 +25,7 @@ class WalletTransactionBuilderTest {
         walletA = new Wallet();
         walletB = new Wallet();
 
-        basicWalletFactory = new BasicWalletService();
+        basicWalletFactory = new SignatureGenerator();
 
         WalletKeysGenerator keysGeneratorA = new WalletKeysGenerator(512);
         PrivateKey skA = keysGeneratorA.getPrivateKey();

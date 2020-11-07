@@ -100,7 +100,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     }
 
     private void chainRequest(String address, String port) {
-        Protocol protocol = messageFactory.generateMessages(NODES_RESPONSE);
+        Protocol protocol = messageFactory.generateMessages(CHAIN_RESPONSE);
         p2pService.sendMessageTo(protocol.generateMessage(), address, port);
     }
 

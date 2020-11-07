@@ -2,7 +2,7 @@ package com.blackhearth.blockchain.wallet;
 
 import com.blackhearth.blockchain.wallet.signature.SignatureUtils;
 
-public class BasicWalletService implements WalletService {
+public class SignatureGenerator implements WalletService {
     @Override
     public String getWalletHash(Wallet wallet) {
         return SignatureUtils.applySha256(

@@ -28,7 +28,7 @@ public class WalletConfiguration {
             WalletKeysGenerator keyGenerator = new WalletKeysGenerator(2048);
             wallet.setPrivateKey(keyGenerator.getPrivateKey());
             wallet.setPublicKey(keyGenerator.getPublicKey());
-            wallet.setHash(new BasicWalletService().getWalletHash(wallet));
+            wallet.setHash(new SignatureGenerator().getWalletHash(wallet));
             try (FileWriter fileWriter = new FileWriter(new File(wallet.getHash()))) {
                 fileWriter.append(new Gson().toJson(wallet));
                 return wallet;
