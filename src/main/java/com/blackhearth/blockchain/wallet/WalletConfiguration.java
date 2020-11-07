@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.security.NoSuchAlgorithmException;
 
 @Configuration
 @RequiredArgsConstructor
@@ -26,14 +25,14 @@ public class WalletConfiguration {
     public Wallet wallet() {
         if (newWallet) {
             Wallet wallet = new Wallet();
-            try (FileWriter fileWriter = new FileWriter(new File("wallet.dat"))) {
-                WalletKeysGenerator keyGenerator = new WalletKeysGenerator(2048);
-                wallet.setPrivateKey(keyGenerator.getPrivateKey());
-                wallet.setPublicKey(keyGenerator.getPublicKey());
-                wallet.setHash(new BasicWalletService().getWalletHash(wallet));
+            WalletKeysGenerator keyGenerator = new WalletKeysGenerator(2048);
+            wallet.setPrivateKey(keyGenerator.getPrivateKey());
+            wallet.setPublicKey(keyGenerator.getPublicKey());
+            wallet.setHash(new BasicWalletService().getWalletHash(wallet));
+            try (FileWriter fileWriter = new FileWriter(new File(wallet.getHash()))) {
                 fileWriter.append(new Gson().toJson(wallet));
                 return wallet;
-            } catch (NoSuchAlgorithmException | IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 return new Wallet();
             }

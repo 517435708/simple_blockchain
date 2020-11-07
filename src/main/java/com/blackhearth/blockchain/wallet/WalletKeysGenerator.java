@@ -1,6 +1,7 @@
 package com.blackhearth.blockchain.wallet;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.security.*;
 
@@ -11,7 +12,8 @@ public class WalletKeysGenerator {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    public WalletKeysGenerator(int keylength) throws NoSuchAlgorithmException {
+    @SneakyThrows
+    public WalletKeysGenerator(int keylength)  {
         keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(keylength);
         createKeys();
