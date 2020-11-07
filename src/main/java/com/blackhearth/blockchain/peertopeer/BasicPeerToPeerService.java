@@ -1,9 +1,9 @@
 package com.blackhearth.blockchain.peertopeer;
 
+import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.BlockMiner;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
-import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.protocol.message.MessageFactory;
 import com.blackhearth.blockchain.protocol.message.ProtocolHeader;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,17 +28,16 @@ public class BasicPeerToPeerService implements PeerToPeerService {
 
     private final BlockMiner miner;
     private final MessageFactory messageFactory;
-
-    private int tcpPort = 0;
-
     private final BlockingQueue<String> messages;
+    private int tcpPort = 0;
     private AtomicBoolean isRunning = new AtomicBoolean(false);
 
     @Value("${mining:false}")
     private boolean mining;
 
     @Override
-    public void start(int tcpPort) throws IOException {
+    public void start(int tcpPort) throws
+                                   IOException {
         this.tcpPort = tcpPort;
         communication.start(tcpPort);
         if (mining) {
@@ -49,14 +49,27 @@ public class BasicPeerToPeerService implements PeerToPeerService {
     @SneakyThrows
     @Override
     public void sendMessageTo(String message, String address, String port) {
-        try {
-            log.info("Sending msg: {} to {}:{}", message, address, port);
-            communication.sendTo(message, address, Integer.parseInt(port));
-        }catch (Exception e){
-            log.error("Failed to send msg: {} to {}:{}", message, address, port);
-            log.error(e.getMessage());
-            p2pRepository.deleteNode(new BlockChainNodeData(Integer.parseInt(port), address));
-        }
+        final int MAX_RECONECTIONS = 10;
+
+        new Thread(() -> {
+            for (int i = 0; i <= MAX_RECONECTIONS; i++) {
+                try {
+                    log.info("Sending msg: {} to {}:{}", message, address, port);
+                    communication.sendTo(message, address, Integer.parseInt(port));
+                    break;
+                } catch (Exception e) {
+                    log.error("Failed to send msg: {} to {}:{}", message, address, port);
+                    log.error("Attempt #{}. Reconnecting to: {} to {}:{}", i, message, address, port);
+                    log.error(e.getMessage());
+                }
+
+
+                if (i == MAX_RECONECTIONS) {
+                    log.error("Reconnecting didn't success.");
+                    p2pRepository.deleteNode(new BlockChainNodeData(Integer.parseInt(port), address));
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -72,13 +85,13 @@ public class BasicPeerToPeerService implements PeerToPeerService {
             while (!messages.isEmpty()) {
                 try {
                     String msg = messages.take();
-                    new Thread(() -> communication
+                    communication
                             .getAllKnownHosts()
-                            .stream().filter(host -> !(host.getIp()
-                                                           .equals(IpUtils.getLocalHostLANAddress()
-                                                                          .getHostAddress()) && host.getPort() == tcpPort))
-                            .forEach(host -> sendMessageTo(msg, host.getIp(), String.valueOf(host.getPort()))))
-                            .start();
+                            .stream()
+                            .filter(host -> !(host.getIp()
+                                                  .equals(IpUtils.getLocalHostLANAddress()
+                                                                 .getHostAddress()) && host.getPort() == tcpPort))
+                            .forEach(host -> sendMessageTo(msg, host.getIp(), String.valueOf(host.getPort())));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -105,7 +118,10 @@ public class BasicPeerToPeerService implements PeerToPeerService {
         while (true) {
             miner.startMining();
             blockChainRepository.addToBlockChain(miner.lastMinedBlock());
-            sendMessageToAllKnownNodes(messageFactory.generateMessages(ProtocolHeader.ADD_BLOCK).generateMessage());
+            List<Block> longestChain = blockChainRepository.extractLongestChain();
+            log.info("Longest chain ({}): {}", longestChain.size(), longestChain);
+            sendMessageToAllKnownNodes(messageFactory.generateMessages(ProtocolHeader.ADD_BLOCK)
+                                                     .generateMessage());
         }
     }
 }

@@ -36,7 +36,7 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
 
     @Override
     public void deleteNode(BlockChainNodeData data) {
-        log.info("Deleting node {}:{}", data.getIp(), data.getPort());
+        log.warn("Deleting node {}:{}", data.getIp(), data.getPort());
         knownNodes
                 .stream()
                 .filter(node -> node.getIp().equals(data.getIp()) && node.getPort() == data.getPort())

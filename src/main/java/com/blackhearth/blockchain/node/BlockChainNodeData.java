@@ -15,6 +15,6 @@ public class BlockChainNodeData {
 
     @Override
     public String toString() {
-        return String.format("BCN{%s:%d}", ip, port);
+        return String.format("BCN{%s:%d,%s}", ip, port, String.valueOf(deleted));
     }
 }
