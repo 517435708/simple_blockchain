@@ -2,12 +2,16 @@ package com.blackhearth.blockchain.node;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class BlockChainNodeData {
-    private int port;
-    private String ip;
+    private final int port;
+    private final String ip;
+
+    private boolean deleted;
 
     @Override
     public String toString() {

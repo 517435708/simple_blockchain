@@ -5,7 +5,6 @@ import com.blackhearth.blockchain.block.BlockMiner;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
-import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import com.blackhearth.blockchain.wallet.Wallet;
 import com.blackhearth.blockchain.wallet.transaction.Transaction;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 
 @Component
@@ -111,7 +109,7 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateNodesResponseMessage() {
-        Set<BlockChainNodeData> data = peerToPeerRepository.getNodes();
+        List<BlockChainNodeData> data = peerToPeerRepository.getNodes();
         NodesResponseMessage nodesResponseMessage = new NodesResponseMessage();
         nodesResponseMessage.setNodes(new ArrayList<>(data));
         return nodesResponseMessage;
