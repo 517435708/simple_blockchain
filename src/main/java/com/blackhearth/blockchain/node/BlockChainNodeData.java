@@ -11,7 +11,7 @@ public class BlockChainNodeData {
     private final int port;
     private final String ip;
 
-    private boolean deleted;
+    private transient boolean deleted;
 
     @Override
     public String toString() {
