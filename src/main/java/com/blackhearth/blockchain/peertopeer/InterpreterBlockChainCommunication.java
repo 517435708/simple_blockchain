@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Set;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -42,6 +42,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
         server.start();
         server.bind(tcpPort);
         serverPort = tcpPort;
+        client.start();
         initializeInterpreter();
 
         printInfoAboutKnownHosts();
@@ -49,14 +50,12 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
 
     @Override
     public void sendTo(String message, String host, int port) throws IOException {
-        client.start();
         client.connect(CONNECTION_TIMEOUT, host, port);
         client.sendTCP(new CommunicationObject(message, serverPort));
-        client.close();
     }
 
     @Override
-    public Set<BlockChainNodeData> getAllKnownHosts() {
+    public List<BlockChainNodeData> getAllKnownHosts() {
         return repository.getNodes();
     }
 
