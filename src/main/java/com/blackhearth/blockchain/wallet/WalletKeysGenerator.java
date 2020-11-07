@@ -5,13 +5,13 @@ import lombok.Getter;
 import java.security.*;
 
 @Getter
-public class KeysGenerator {
+public class WalletKeysGenerator {
 
     private KeyPairGenerator keyGen;
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    public KeysGenerator(int keylength) throws NoSuchAlgorithmException {
+    public WalletKeysGenerator(int keylength) throws NoSuchAlgorithmException {
         keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(keylength);
         createKeys();

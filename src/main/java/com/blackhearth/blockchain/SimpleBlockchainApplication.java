@@ -9,18 +9,17 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.Map;
-
 @SpringBootApplication
 public class SimpleBlockchainApplication {
 
 	@SneakyThrows
 	public static void main(String[] args) {
-		ConfigurableApplicationContext run = SpringApplication.run(SimpleBlockchainApplication.class, args);
-		Map<RunParams, Object> params = ParamsReader.getParams(args);
-		String firstKnownHost = String.valueOf(params.getOrDefault(RunParams.FIRST_KNOWN, null));
+		ConfigurableApplicationContext context = SpringApplication.run(SimpleBlockchainApplication.class, args);
+		var params = ParamsReader.getParams(args);
 
-		BlockChainNode blockChainNode = run.getBean("blockChainNode", BlockChainNode.class);
+		String firstKnownHost = String.valueOf(params.getOrDefault(RunParams.FIRST_KNOWN, null));
+		BlockChainNode blockChainNode = context.getBean(BlockChainNode.class);
 		blockChainNode.start(HostInfo.from(firstKnownHost));
 	}
+
 }

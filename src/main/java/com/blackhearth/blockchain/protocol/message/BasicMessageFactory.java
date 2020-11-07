@@ -39,8 +39,7 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     @Override
-    public Protocol generateMessages(ProtocolHeader header, String walletAddress) throws
-                                                                                  BlockChainNodeException {
+    public Protocol generateMessages(ProtocolHeader header, String walletAddress) {
         switch (header) {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
@@ -62,14 +61,17 @@ public class BasicMessageFactory implements MessageFactory {
                 return generateNodesRequestMessage();
             case NODES_RESPONSE:
                 return generateNodesResponseMessage();
+            case CHAIN_REQUEST:
+                return chainRequest();
+            case CHAIN_RESPONSE:
+                return chainResponse();
             default:
-                throw new BlockChainNodeException("Wrong Key");
+                return () -> "DUMMY";
         }
     }
 
     @Override
-    public Protocol generateMessages(ProtocolHeader header) throws
-                                                            BlockChainNodeException {
+    public Protocol generateMessages(ProtocolHeader header) {
         switch (header) {
             case NOTIFY_NODE:
                 return generateNotifyNodeMessage();
@@ -89,9 +91,23 @@ public class BasicMessageFactory implements MessageFactory {
                 return generateNodesRequestMessage();
             case NODES_RESPONSE:
                 return generateNodesResponseMessage();
+            case CHAIN_REQUEST:
+                return chainRequest();
+            case CHAIN_RESPONSE:
+                return chainResponse();
             default:
-                throw new BlockChainNodeException("Wrong Key");
+                return () -> "DUMMY";
         }
+    }
+
+    private Protocol chainResponse() {
+        ChainResponseMessage chainResponse = new ChainResponseMessage();
+        chainResponse.setChain(blockChainRepository.extractLongestChain());
+        return chainResponse;
+    }
+
+    private Protocol chainRequest() {
+        return new ChainRequestMessage();
     }
 
     private Protocol generateNodesResponseMessage() {
@@ -160,8 +176,7 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     @SneakyThrows
-    private Protocol generateNotifyNodeMessage() throws
-                                                 BlockChainNodeException {
+    private Protocol generateNotifyNodeMessage() {
         NotifyNodeMessage notifyNodeMessage = new NotifyNodeMessage();
         BlockChainNodeData data = blockChainNode.composeData();
 

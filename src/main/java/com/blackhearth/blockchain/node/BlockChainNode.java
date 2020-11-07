@@ -1,5 +1,6 @@
 package com.blackhearth.blockchain.node;
 
+import com.blackhearth.blockchain.block.BlockMiner;
 import com.blackhearth.blockchain.peertopeer.BasicPeerToPeerRepository;
 import com.blackhearth.blockchain.peertopeer.HostInfo;
 import com.blackhearth.blockchain.peertopeer.IpUtils;
@@ -25,6 +26,7 @@ public class BlockChainNode {
     private final BasicMessageFactory messageFactory;
     private final BasicPeerToPeerRepository p2pRepository;
 
+
     private boolean isNodeRunning = false;
 
     @Getter
@@ -36,8 +38,6 @@ public class BlockChainNode {
         if (!isNodeRunning) {
             port = discoverPort();
             runNode();
-//            runMiner(); // TODO: 2020-11-04  
-//            createWallet(); // TODO: 2020-11-04  
             sendRequestToFirstKnownHost(firstKnown);
             isNodeRunning = true;
         }
@@ -53,16 +53,6 @@ public class BlockChainNode {
         p2pService.start(port);
         p2pRepository.saveNode(new BlockChainNodeData(port, IpUtils.getLocalHostLANAddress().getHostAddress()));
         log.info("BlockChain started on TCP port {}", port);
-    }
-
-    private void runMiner() {
-        // TODO: 2020-11-04  
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
-
-    private void createWallet() {
-        // TODO: 2020-11-04  
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @SneakyThrows

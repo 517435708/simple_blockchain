@@ -38,6 +38,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     @Override
     public void interpretMessage(String message, String senderAddress, String senderPort) {
+        log.info("interpreting {}", message);
         Optional<ProtocolHeader> optionalProtocolHeader = ProtocolHeader.getFromCode(message.substring(0, 2));
         optionalProtocolHeader.ifPresent(protocolHeader -> proceed(protocolHeader,
                                                                    message.substring(2),
@@ -77,12 +78,32 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
             case NODES_RESPONSE:
                 nodesResponse(value);
                 break;
+            case CHAIN_REQUEST:
+                chainRequest(address, port);
+                break;
+            case CHAIN_RESPONSE:
+                chainResponse(value);
+                break;
             default:
                 break;
         }
     }
 
-    @SneakyThrows
+    private void chainResponse(String value) {
+        Block[] blocks = new Gson().fromJson(value, Block[].class);
+        int chainSize = blockChainRepository.extractLongestChain().size();
+        if (chainSize < blocks.length) {
+            for (var block : blocks) {
+                blockChainRepository.addToBlockChain(block);
+            }
+        }
+    }
+
+    private void chainRequest(String address, String port) {
+        Protocol protocol = messageFactory.generateMessages(NODES_RESPONSE);
+        p2pService.sendMessageTo(protocol.generateMessage(), address, port);
+    }
+
     private void nodesResponse(String value) {
         BlockChainNodeData[] nodes = new Gson().fromJson(value, BlockChainNodeData[].class);
         for (var node : nodes) {
@@ -91,15 +112,14 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
         String notifyNodeMessage = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE).generateMessage();
         p2pService.sendMessageToAllKnownNodes(notifyNodeMessage);
+
+        String askForBlock = messageFactory.generateMessages(CHAIN_REQUEST).generateMessage();
+        p2pService.sendMessageToAllKnownNodes(askForBlock);
     }
 
     private void nodesRequest(String address, String port) {
-        try {
-            Protocol protocol = messageFactory.generateMessages(NODES_RESPONSE);
-            p2pService.sendMessageTo(protocol.generateMessage(), address, port);
-        } catch (BlockChainNodeException e) {
-            log.error(String.valueOf(e));
-        }
+        Protocol protocol = messageFactory.generateMessages(NODES_RESPONSE);
+        p2pService.sendMessageTo(protocol.generateMessage(), address, port);
     }
 
     private void walletsResponse(String value) {
@@ -108,12 +128,8 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     }
 
     private void walletsRequest(String address, String port) {
-        try {
-            Protocol protocol = messageFactory.generateMessages(WALLETS_RESPONSE);
-            p2pService.sendMessageTo(protocol.generateMessage(), address, port);
-        } catch (BlockChainNodeException e) {
-            log.error(String.valueOf(e));
-        }
+        Protocol protocol = messageFactory.generateMessages(WALLETS_RESPONSE);
+        p2pService.sendMessageTo(protocol.generateMessage(), address, port);
     }
 
     private void walletDataResponse(String value) {
@@ -128,12 +144,8 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     }
 
     private void walletDataRequest(String walletAddress, String address, String port) {
-        try {
-            Protocol protocol = messageFactory.generateMessages(WALLET_DATA_RESPONSE, walletAddress);
-            p2pService.sendMessageTo(protocol.generateMessage(), address, port);
-        } catch (BlockChainNodeException ex) {
-            log.error(String.valueOf(ex));
-        }
+        Protocol protocol = messageFactory.generateMessages(WALLET_DATA_RESPONSE, walletAddress);
+        p2pService.sendMessageTo(protocol.generateMessage(), address, port);
     }
 
     private void transaction(String value) {

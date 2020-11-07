@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BasicBlockBuilder implements BlockBuilder {
 
-    private Block blockInBuildingProcess;
     private final BlockChainRepository repository;
     private final Wallet wallet;
+    private Block blockInBuildingProcess;
 
     @Override
     public void addDataToNextBlock(String data) {
@@ -19,15 +19,28 @@ public class BasicBlockBuilder implements BlockBuilder {
             blockInBuildingProcess.setData(blockInBuildingProcess.getData() + "\n" + data);
         } else {
             blockInBuildingProcess = new Block();
-            blockInBuildingProcess.setData("MINED" + wallet.getHash());
+            if (!wallet.getHash()
+                       .equals("")) {
+                blockInBuildingProcess.setData("MINED" + wallet.getHash());
+            }
             blockInBuildingProcess.setTimeStamp(System.currentTimeMillis());
-            blockInBuildingProcess.setData(data);
+            blockInBuildingProcess.setData(blockInBuildingProcess.getData() + "\n" + data);
             blockInBuildingProcess.setPreviousHash(repository.getLastBlockHash());
         }
     }
 
     @Override
     public Block extractBlock() {
+        if (blockInBuildingProcess == null) {
+            Block block = new Block();
+            if (!wallet.getHash()
+                       .equals("")) {
+                block.setData("MINED" + wallet.getHash());
+            }
+            block.setTimeStamp(System.currentTimeMillis());
+            block.setPreviousHash(repository.getLastBlockHash());
+            return block;
+        }
         Block block = blockInBuildingProcess;
         blockInBuildingProcess = null;
         return block;

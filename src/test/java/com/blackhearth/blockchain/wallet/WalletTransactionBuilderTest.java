@@ -27,11 +27,11 @@ class WalletTransactionBuilderTest {
 
         basicWalletFactory = new BasicWalletService();
 
-        KeysGenerator keysGeneratorA = new KeysGenerator(512);
+        WalletKeysGenerator keysGeneratorA = new WalletKeysGenerator(512);
         PrivateKey skA = keysGeneratorA.getPrivateKey();
         PublicKey pkA = keysGeneratorA.getPublicKey();
 
-        KeysGenerator keysGeneratorB = new KeysGenerator(512);
+        WalletKeysGenerator keysGeneratorB = new WalletKeysGenerator(512);
         PrivateKey skB = keysGeneratorB.getPrivateKey();
         PublicKey pkB = keysGeneratorB.getPublicKey();
 
@@ -42,8 +42,8 @@ class WalletTransactionBuilderTest {
         walletB.setPublicKey(pkB);
 
 
-        walletA.setHash(basicWalletFactory.setWalletHash(walletA));
-        walletB.setHash(basicWalletFactory.setWalletHash(walletB));
+        walletA.setHash(basicWalletFactory.getWalletHash(walletA));
+        walletB.setHash(basicWalletFactory.getWalletHash(walletB));
 
 
         Transaction lastTransaction = new Transaction();

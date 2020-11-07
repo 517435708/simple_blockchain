@@ -9,8 +9,6 @@ import java.util.*;
 public class BlockChainConfig {
     @Bean("blockChain")
     public Map<String, List<Block>> blockchain() {
-        Map<String, List<Block>> hashMap = new HashMap<>();
-        hashMap.put("", new ArrayList<>());
-        return hashMap;
+        return new HashMap<>();
     }
 }

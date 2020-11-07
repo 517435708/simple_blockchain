@@ -15,4 +15,5 @@ public interface BlockChainRepository {
 
     String getLastBlockHash();
 
+    List<Block> extractLongestChain();
 }

@@ -14,7 +14,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class Block {
     private String hash;
     private String previousHash;
-    private String data;
+    private String data = "";
     private long timeStamp;
     private int nonce;
 

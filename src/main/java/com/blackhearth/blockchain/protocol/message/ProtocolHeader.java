@@ -15,7 +15,9 @@ public enum ProtocolHeader {
     WALLETS_REQUEST("WS"),
     WALLETS_RESPONSE("WE"),
     NODES_REQUEST("NS"),
-    NODES_RESPONSE("NR");
+    NODES_RESPONSE("NR"),
+    CHAIN_REQUEST("CR"),
+    CHAIN_RESPONSE("CS");
 
 
     ProtocolHeader(String code) {

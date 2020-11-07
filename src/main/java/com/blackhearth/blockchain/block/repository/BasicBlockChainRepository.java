@@ -1,7 +1,7 @@
 package com.blackhearth.blockchain.block.repository;
 
 import com.blackhearth.blockchain.block.Block;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.NOTIFY_WALLET;
 import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.TRANSACTION;
 
-@Repository
+@Component
 public class BasicBlockChainRepository implements BlockChainRepository {
 
     private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "[a-zA-Z0-9]+\\|[a-zA-Z0-9]+\\|(-?\\d+\\.?\\d*)");
@@ -89,7 +89,14 @@ public class BasicBlockChainRepository implements BlockChainRepository {
 
     @Override
     public void addToBlockChain(Block block) {
-        getChainToBlockHash(block.getPreviousHash()).add(block);
+        var chain = getChainToBlockHash(block.getPreviousHash());
+        if (chain.isEmpty()) {
+            blockChain.put(block.getPreviousHash(), new ArrayList<>());
+            blockChain.get(block.getPreviousHash()).add(block);
+        } else if (!chain.contains(block)) {
+            chain.add(block);
+        }
+
     }
 
     @Override
@@ -102,17 +109,8 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                    .getHash();
     }
 
-    private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
-        return searchThroughChain(longestChain, false, record -> {
-            if (record.contains(NOTIFY_WALLET.getCode()) && record.contains(walletAddress)) {
-                return true;
-            } else {
-                return null;
-            }
-        });
-    }
-
-    private List<Block> extractLongestChain() {
+    @Override
+    public List<Block> extractLongestChain() {
 
         if (blockChain.isEmpty()) {
             return Collections.emptyList();
@@ -137,6 +135,17 @@ public class BasicBlockChainRepository implements BlockChainRepository {
         }
         return blockChain.get(hash);
     }
+
+    private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
+        return searchThroughChain(longestChain, false, record -> {
+            if (record.contains(NOTIFY_WALLET.getCode()) && record.contains(walletAddress)) {
+                return true;
+            } else {
+                return null;
+            }
+        });
+    }
+
 
     private Double getAmountOfCoinsFromTransactions(String address, List<Block> longestChain) {
 

@@ -4,16 +4,17 @@ import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Component
+@RequiredArgsConstructor
 public class ChainValidator implements Validator {
     private static final String HASH_STARTS_WITH = "000001";
-    private BlockChainRepository repository;
+    private final BlockChainRepository repository;
 
     @Override
     public boolean isBlockValid(Block block) {

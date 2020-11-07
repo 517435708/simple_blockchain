@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Configuration
 public class Config {
@@ -23,4 +25,10 @@ public class Config {
     Server getServerBean() {
         return new Server();
     }
+
+    @Bean
+    BlockingQueue<String> queue() {
+        return new LinkedBlockingQueue<>();
+    }
+
 }

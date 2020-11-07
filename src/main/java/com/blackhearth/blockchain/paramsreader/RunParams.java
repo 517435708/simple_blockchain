@@ -9,15 +9,16 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public enum RunParams {
     FIRST_KNOWN("-fn", TwoArgsParamService.class),
-    UNKNOWN("", DoNthParamService.class);
+    UNKNOWN("", NoArgsParamService.class);
 
     private String value;
     private Class<? extends ParamService> paramService;
 
     public static RunParams getByValue(String value) {
         return Stream.of(RunParams.values())
-                .filter(en -> en.getValue().equals(value))
-                .findFirst()
-                .orElse(UNKNOWN);
+                     .filter(en -> en.getValue()
+                                     .equals(value))
+                     .findFirst()
+                     .orElse(UNKNOWN);
     }
 }

@@ -19,7 +19,7 @@ import java.util.Set;
 @Component
 public class InterpreterBlockChainCommunication implements BlockChainCommunication {
     private static final int CONNECTION_TIMEOUT = 5000;
-    private static final int PRINT_ALL_NODES_SEQUENCE_MS = 5000;
+    private static final int PRINT_ALL_NODES_SEQUENCE_MS = 50000;
 
     private final Server server;
     private final Client client;
@@ -52,7 +52,6 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
         client.start();
         client.connect(CONNECTION_TIMEOUT, host, port);
         client.sendTCP(new CommunicationObject(message, serverPort));
-
         client.close();
     }
 
@@ -108,7 +107,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
                     log.error(e.getMessage());
                 }
             }
-        }).start();
+        });
     }
 }
 
