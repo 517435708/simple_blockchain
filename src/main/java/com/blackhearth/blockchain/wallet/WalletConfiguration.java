@@ -31,7 +31,7 @@ public class WalletConfiguration {
                 wallet.setPrivateKey(keyGenerator.getPrivateKey());
                 wallet.setPublicKey(keyGenerator.getPublicKey());
                 wallet.setHash(new BasicWalletService().getWalletHash(wallet));
-                fileWriter.append(new Gson().toJson(wallet));
+                fileWriter.append(new Gson().toJson(new SimpleWallet(wallet)));
                 return wallet;
             } catch (NoSuchAlgorithmException | IOException e) {
                 e.printStackTrace();
