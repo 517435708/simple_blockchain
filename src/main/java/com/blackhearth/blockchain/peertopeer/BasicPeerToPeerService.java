@@ -97,6 +97,7 @@ public class BasicPeerToPeerService implements PeerToPeerService {
         try {
             startMining();
         } catch (Exception ex) {
+            ex.printStackTrace();
             log.error(String.valueOf(ex));
         }
     }
