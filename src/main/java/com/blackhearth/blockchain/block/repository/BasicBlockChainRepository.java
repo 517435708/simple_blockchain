@@ -91,7 +91,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     public void addToBlockChain(Block block) {
         var chain = getChainToBlockHash(block.getPreviousHash());
         if (chain.isEmpty()) {
-            blockChain.put(block.getPreviousHash(), new ArrayList<>());
+            blockChain.put(block.getPreviousHash(), Collections.synchronizedList(new ArrayList<>()));
             blockChain.get(block.getPreviousHash()).add(block);
         } else if (!chain.contains(block)) {
             chain.add(block);
