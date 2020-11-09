@@ -142,7 +142,8 @@ public class BasicBlockChainRepository implements BlockChainRepository {
             return new ArrayList<>();
         }
 
-        Set<Map.Entry<String, List<Block>>> blockChainEntries = blockChain.entrySet();
+        HashMap<String, List<Block>> copyOfBlockchain = new HashMap<>(blockChain);
+        Set<Map.Entry<String, List<Block>>> blockChainEntries = copyOfBlockchain.entrySet();
         String hash = "";
         int maxSize = 0;
         for (var hashByChain : blockChainEntries) {
