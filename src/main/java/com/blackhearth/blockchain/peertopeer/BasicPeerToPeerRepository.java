@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BasicPeerToPeerRepository implements PeerToPeerRepository {
     Collection<BlockChainNodeData> knownNodes = Collections.synchronizedCollection(new ArrayList<>());
+    Collection<WalletData> knowWallets = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public List<BlockChainNodeData> getNodes() {
@@ -19,6 +20,12 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
         return knownNodes.stream()
                 .filter(node -> !node.isDeleted())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WalletData> getWalletsData() {
+        log.info("Known wallets are: {}", knowWallets);
+        return new ArrayList<>(knowWallets);
     }
 
     @Override
@@ -45,7 +52,8 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
 
     @Override
     public void saveWalletData(WalletData walletData) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        log.info("Saving wallet data to repository {}", walletData);
+        knowWallets.add(walletData);
     }
 
     @Override

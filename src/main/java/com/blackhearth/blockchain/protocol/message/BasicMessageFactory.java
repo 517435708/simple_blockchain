@@ -7,6 +7,7 @@ import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import com.blackhearth.blockchain.wallet.Wallet;
+import com.blackhearth.blockchain.wallet.WalletData;
 import com.blackhearth.blockchain.wallet.transaction.Transaction;
 import lombok.SneakyThrows;
 import org.springframework.context.annotation.Lazy;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -120,7 +122,10 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateWalletsResponseMessage() {
-        List<String> data = blockChainRepository.getWallets();
+        List<String> data = peerToPeerRepository.getWalletsData()
+                .stream()
+                .map(WalletData::getAddress)
+                .collect(Collectors.toList());
         WalletsResponseMessage walletsResponseMessage = new WalletsResponseMessage();
         walletsResponseMessage.setWallets(data);
         return walletsResponseMessage;
@@ -131,12 +136,17 @@ public class BasicMessageFactory implements MessageFactory {
     }
 
     private Protocol generateWalletDataResponseMessage(String address) {
+        var walletData = peerToPeerRepository
+                .getWalletsData()
+                .stream()
+                .filter(el -> el.getAddress().equals(address))
+                .findFirst()
+                .orElseThrow();
+
         WalletDataResponseMessage walletDataResponseMessage = new WalletDataResponseMessage();
-        walletDataResponseMessage.setAddress(address);
-        walletDataResponseMessage.setAmountOfCoins(blockChainRepository.getCoinsFromAddress(address)
-                                                                       .orElse(""));
-        walletDataResponseMessage.setPublicKey(blockChainRepository.getPublicKeyFromAddress(address)
-                                                                   .orElse(""));
+        walletDataResponseMessage.setAddress(walletData.getAddress());
+        walletDataResponseMessage.setAmountOfCoins(walletData.getAmountOfMoney());
+        walletDataResponseMessage.setPublicKey(walletData.getPublicKey());
         return walletDataResponseMessage;
     }
 
@@ -168,7 +178,7 @@ public class BasicMessageFactory implements MessageFactory {
     private Protocol generateNotifyWalletMessage() {
         NotifyWalletMessage notifyWalletMessage = new NotifyWalletMessage();
         notifyWalletMessage.setPublicKey(wallet.getPublicKey()
-                                               .toString());
+                .toString());
         notifyWalletMessage.setWalletHash(wallet.getHash());
         return notifyWalletMessage;
     }

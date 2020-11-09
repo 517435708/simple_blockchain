@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface PeerToPeerRepository {
     List<BlockChainNodeData> getNodes();
+    List<WalletData> getWalletsData();
     void saveNode(BlockChainNodeData data);
     void saveWalletData(WalletData walletData);
     void saveWalletsAddresses(String[] addresses);
