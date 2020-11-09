@@ -57,7 +57,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     }
 
     @Override
-    public List<Block> getChainToBlockHash(String hash) {
+    synchronized public List<Block> getChainToBlockHash(String hash) {
         HashMap<String, List<Block>> copyOfBlockchain = new HashMap<>(blockChain);
         Set<Map.Entry<String, List<Block>>> blockChainEntries = copyOfBlockchain.entrySet();
 
