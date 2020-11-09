@@ -29,10 +29,16 @@ public class BasicBlockChainRepository implements BlockChainRepository {
         new Thread(() -> {
             while (true) {
                 try {
-                    log.info("START Blockchain dump.");
-                    blockChain.forEach((k,v) -> log.info("'{}':{}", k, v));
-                    log.info("END Blockchain dump.");
                     Thread.sleep(30000);
+
+                    List<Block> longest = extractLongestChain();
+                    log.debug("START Blockchain dump. Longest: ({})", longest.size());
+                    log.debug("Longest: {}", longest);
+                    log.debug("######");
+                    blockChain.forEach((k,v) -> log.debug("'{}':{}", k, v));
+                    log.debug("END Blockchain dump.");
+                    log.debug("######");
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
