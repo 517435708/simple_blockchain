@@ -57,7 +57,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
             }
         }
 
-        return Collections.emptyList();
+        return new ArrayList<>();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     public List<Block> extractLongestChain() {
 
         if (blockChain.isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         String hash = "";
