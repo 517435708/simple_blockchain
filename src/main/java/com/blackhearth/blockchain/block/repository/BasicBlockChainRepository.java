@@ -38,8 +38,8 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                     log.info("END Blockchain dump.");
                     log.info("######");
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    log.error("Nothing to worry about in this moment: {}", e.getMessage());
                 }
             }
         }).start();
@@ -82,7 +82,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
             }
         }
 
-        return new ArrayList<>();
+        return Collections.synchronizedList(new ArrayList<>());
     }
 
     @Override
@@ -137,15 +137,15 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     }
 
     @Override
-    public List<Block> extractLongestChain() {
-
+    synchronized public List<Block> extractLongestChain() {
         if (blockChain.isEmpty()) {
             return new ArrayList<>();
         }
 
+        Set<Map.Entry<String, List<Block>>> blockChainEntries = blockChain.entrySet();
         String hash = "";
         int maxSize = 0;
-        for (var hashByChain : blockChain.entrySet()) {
+        for (var hashByChain : blockChainEntries) {
             int size = hashByChain.getValue()
                                   .size();
             if (maxSize < size) {
@@ -153,7 +153,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                 maxSize = size;
             }
         }
-        for (var hashByChain : blockChain.entrySet()) {
+        for (var hashByChain : blockChainEntries) {
             int size = hashByChain.getValue()
                                   .size();
             if (maxSize - size > 5) {

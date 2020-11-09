@@ -38,7 +38,6 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     @Override
     public void interpretMessage(String message, String senderAddress, String senderPort) {
-        log.info("interpreting {}", message);
         Optional<ProtocolHeader> optionalProtocolHeader = ProtocolHeader.getFromCode(message.substring(0, 2));
         optionalProtocolHeader.ifPresent(protocolHeader -> proceed(protocolHeader,
                                                                    message.substring(2),
