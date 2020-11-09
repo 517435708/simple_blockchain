@@ -44,7 +44,8 @@ public class ChainValidator implements Validator {
     }
 
     private boolean isHashesValid(Block block) {
-        if (block.getPreviousHash().isEmpty()) {
+        List<Block> longest = repository.extractLongestChain();
+        if (block.getPreviousHash().isEmpty() && longest.isEmpty()) {
             return true;
         }
 
