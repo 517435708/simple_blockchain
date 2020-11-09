@@ -21,7 +21,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
 
     private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "[a-zA-Z0-9]+\\|[a-zA-Z0-9]+\\|(-?\\d+\\.?\\d*)");
     @Resource(name = "blockChain")
-    private Map<String, Collection<Block>> blockChain;
+    private Map<String, List<Block>> blockChain;
 
 
     @PostConstruct
@@ -54,7 +54,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     @Override
     public List<Block> getChainToBlockHash(String hash) {
         for (var entry : blockChain.entrySet()) {
-            List<Block> chain = new ArrayList<>(entry.getValue());
+            List<Block> chain = entry.getValue();
             if (chain.get(chain.size() - 1)
                      .getHash()
                      .equals(hash)) {
@@ -67,11 +67,11 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                 if (block.getHash()
                          .equals(hash)) {
                     blockChain.put(hash,
-                                   new ArrayList<>(entry.getValue())
+                                   entry.getValue()
                                         .subList(0,
-                                                 new ArrayList<>(entry.getValue())
+                                                 entry.getValue()
                                                       .indexOf(block)));
-                    return new ArrayList<>(blockChain.get(hash));
+                    return blockChain.get(hash);
                 }
             }
         }
@@ -111,7 +111,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     public void addToBlockChain(Block block) {
         var chain = getChainToBlockHash(block.getPreviousHash());
         if (chain.isEmpty()) {
-            blockChain.put(block.getPreviousHash(), Collections.synchronizedCollection(new ArrayList<>()));
+            blockChain.put(block.getPreviousHash(), new ArrayList<>());
             blockChain.get(block.getPreviousHash()).add(block);
         } else if (!chain.contains(block)) {
             chain.add(block);
@@ -153,7 +153,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                 blockChain.remove(hashByChain.getKey());
             }
         }
-        return new ArrayList<>(blockChain.get(hash));
+        return blockChain.get(hash);
     }
 
     private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
