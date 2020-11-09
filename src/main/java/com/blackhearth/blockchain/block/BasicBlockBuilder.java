@@ -3,14 +3,16 @@ package com.blackhearth.blockchain.block;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.wallet.Wallet;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 @Component
+@Setter
 @RequiredArgsConstructor
 public class BasicBlockBuilder implements BlockBuilder {
 
     private final BlockChainRepository repository;
-    private final Wallet wallet;
+    private Wallet wallet;
     private Block blockInBuildingProcess;
 
     @Override
