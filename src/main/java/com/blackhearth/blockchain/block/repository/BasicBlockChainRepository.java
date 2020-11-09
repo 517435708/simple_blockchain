@@ -58,7 +58,10 @@ public class BasicBlockChainRepository implements BlockChainRepository {
 
     @Override
     public List<Block> getChainToBlockHash(String hash) {
-        for (var entry : blockChain.entrySet()) {
+        HashMap<String, List<Block>> copyOfBlockchain = new HashMap<>(blockChain);
+        Set<Map.Entry<String, List<Block>>> blockChainEntries = copyOfBlockchain.entrySet();
+
+        for (var entry : blockChainEntries) {
             List<Block> chain = entry.getValue();
             if (chain.get(chain.size() - 1)
                      .getHash()
@@ -67,7 +70,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
             }
         }
 
-        for (var entry : blockChain.entrySet()) {
+        for (var entry : blockChainEntries) {
             for (var block : entry.getValue()) {
                 if (block.getHash()
                          .equals(hash)) {
@@ -139,7 +142,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     @Override
     synchronized public List<Block> extractLongestChain() {
         if (blockChain.isEmpty()) {
-            return new ArrayList<>();
+            return Collections.synchronizedList(new ArrayList<>());
         }
 
         HashMap<String, List<Block>> copyOfBlockchain = new HashMap<>(blockChain);
