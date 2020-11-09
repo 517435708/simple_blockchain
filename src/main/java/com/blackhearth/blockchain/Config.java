@@ -11,6 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Configuration
 public class Config {
+    private static final int BUFFER = 9999;
+
     @Bean
     Random random() {
         return new Random();
@@ -18,12 +20,12 @@ public class Config {
 
     @Bean
     Client getClient() {
-        return new Client();
+        return new Client(BUFFER, BUFFER);
     }
 
     @Bean
     Server getServerBean() {
-        return new Server();
+        return new Server(BUFFER, BUFFER);
     }
 
     @Bean
