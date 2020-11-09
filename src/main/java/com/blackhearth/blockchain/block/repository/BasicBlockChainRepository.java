@@ -1,8 +1,10 @@
 package com.blackhearth.blockchain.block.repository;
 
 import com.blackhearth.blockchain.block.Block;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
@@ -14,11 +16,34 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.NOTIFY_
 import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.TRANSACTION;
 
 @Component
+@Slf4j
 public class BasicBlockChainRepository implements BlockChainRepository {
 
     private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "[a-zA-Z0-9]+\\|[a-zA-Z0-9]+\\|(-?\\d+\\.?\\d*)");
     @Resource(name = "blockChain")
     private Map<String, List<Block>> blockChain;
+
+    @PostConstruct
+    private void printBlochchain() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(30000);
+
+                    List<Block> longest = extractLongestChain();
+                    log.info("START Blockchain dump. Longest: ({})", longest.size());
+                    log.info("Longest: {}", longest);
+                    log.info("######");
+                    blockChain.forEach((k,v) -> log.info("'{}':{}", k, v));
+                    log.info("END Blockchain dump.");
+                    log.info("######");
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 
     @Override
     public Optional<String> getCoinsFromAddress(String walletAddress) {
