@@ -5,13 +5,17 @@ import com.blackhearth.blockchain.wallet.WalletData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
 public class BasicPeerToPeerRepository implements PeerToPeerRepository {
     Collection<BlockChainNodeData> knownNodes = Collections.synchronizedCollection(new ArrayList<>());
+    Collection<WalletData> knownWallets = Collections.synchronizedCollection(new ArrayList<>());
 
     @Override
     public List<BlockChainNodeData> getNodes() {
@@ -19,6 +23,11 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
         return knownNodes.stream()
                 .filter(node -> !node.isDeleted())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WalletData> getWallets() {
+        return new ArrayList<>(knownWallets);
     }
 
     @Override
@@ -45,7 +54,7 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
 
     @Override
     public void saveWalletData(WalletData walletData) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+        knownWallets.add(walletData);
     }
 
     @Override

@@ -7,7 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class WalletData {
+public class
+WalletData {
     private String address;
     private String amountOfMoney;
     private String publicKey;
