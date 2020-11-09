@@ -2,18 +2,17 @@ package com.blackhearth.blockchain.validation;
 
 import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
 @Component
 @RequiredArgsConstructor
 public class ChainValidator implements Validator {
-    private static final String HASH_STARTS_WITH = "000001";
+    private static final String HASH_STARTS_WITH = "00000";
     private final BlockChainRepository repository;
 
     @Override
@@ -33,7 +32,7 @@ public class ChainValidator implements Validator {
 
     private boolean isEnoughMoney(TransactionParams params) {
         String coins = repository.getCoinsFromAddress(params.getAddressFrom()).orElse("0");
-        return Integer.parseInt(coins) >= Integer.parseInt(params.getTransactionMoneyAmount());
+        return new BigDecimal(coins).compareTo(new BigDecimal(params.getTransactionMoneyAmount())) >= 0;
     }
 
     private boolean isAddressToExists(TransactionParams params) {
@@ -45,6 +44,10 @@ public class ChainValidator implements Validator {
     }
 
     private boolean isHashesValid(Block block) {
+        if (block.getPreviousHash().isEmpty()) {
+            return true;
+        }
+
         List<Block> blockchain = repository.getChainToBlockHash(block.getPreviousHash());
         if (blockchain.isEmpty()) {
             return false;
@@ -63,7 +66,7 @@ public class ChainValidator implements Validator {
             }
         }
 
-        return !blockchain.isEmpty();
+        return true;
     }
 
     private boolean isProofOfWork(Block block) {
