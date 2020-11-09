@@ -163,7 +163,10 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     private void addBlock(String value) {
         Block block = new Gson().fromJson(value, Block.class);
         if (validator.isBlockValid(block)) {
+            log.info("BLOCK ADDED");
             blockChainRepository.addToBlockChain(block);
+        } else {
+            log.warn("BLOCK NOT ADDED");
         }
     }
 
