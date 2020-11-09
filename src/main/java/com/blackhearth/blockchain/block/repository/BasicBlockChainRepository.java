@@ -46,11 +46,12 @@ public class BasicBlockChainRepository implements BlockChainRepository {
             for (var block : entry.getValue()) {
                 if (block.getHash()
                          .equals(hash)) {
-                    blockChain.put(hash,
-                                   entry.getValue()
-                                        .subList(0,
-                                                 entry.getValue()
-                                                      .indexOf(block)));
+                    blockChain.putIfAbsent(hash,
+                                           Collections.synchronizedList(new ArrayList<>(entry.getValue()
+                                                                                             .subList(0,
+                                                                                                      entry.getValue()
+                                                                                                           .indexOf(
+                                                                                                                   block)))));
                     return blockChain.get(hash);
                 }
             }
@@ -90,9 +91,10 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     @Override
     public void addToBlockChain(Block block) {
         var chain = getChainToBlockHash(block.getPreviousHash());
-        if (chain.isEmpty()) {
-            blockChain.put(block.getPreviousHash(), Collections.synchronizedList(new ArrayList<>()));
-            blockChain.get(block.getPreviousHash()).add(block);
+        if (chain.isEmpty() && !blockChain.containsKey(block.getPreviousHash())) {
+            blockChain.putIfAbsent(block.getPreviousHash(), Collections.synchronizedList(new ArrayList<>()));
+            blockChain.get(block.getPreviousHash())
+                      .add(block);
         } else if (!chain.contains(block)) {
             chain.add(block);
         }
