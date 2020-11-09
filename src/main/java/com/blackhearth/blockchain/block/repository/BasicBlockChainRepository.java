@@ -34,7 +34,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     @Override
     public List<Block> getChainToBlockHash(String hash) {
         for (var entry : blockChain.entrySet()) {
-            List<Block> chain = (List<Block>) entry.getValue();
+            List<Block> chain = new ArrayList<>(entry.getValue());
             if (chain.get(chain.size() - 1)
                      .getHash()
                      .equals(hash)) {
@@ -47,11 +47,11 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                 if (block.getHash()
                          .equals(hash)) {
                     blockChain.put(hash,
-                                   ((List<Block>) entry.getValue())
+                                   new ArrayList<>(entry.getValue())
                                         .subList(0,
-                                                 ((List<Block>) entry.getValue())
+                                                 new ArrayList<>(entry.getValue())
                                                       .indexOf(block)));
-                    return (List<Block>) blockChain.get(hash);
+                    return new ArrayList<>(blockChain.get(hash));
                 }
             }
         }
@@ -133,7 +133,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                 blockChain.remove(hashByChain.getKey());
             }
         }
-        return (List<Block>) blockChain.get(hash);
+        return new ArrayList<>(blockChain.get(hash));
     }
 
     private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
