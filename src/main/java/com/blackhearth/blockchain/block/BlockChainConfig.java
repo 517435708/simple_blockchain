@@ -8,7 +8,7 @@ import java.util.*;
 @Configuration
 public class BlockChainConfig {
     @Bean("blockChain")
-    public Map<String, Collection<Block>> blockchain() {
+    public Map<String, List<Block>> blockchain() {
         return new HashMap<>();
     }
 }
