@@ -8,7 +8,10 @@ import java.util.*;
 @Configuration
 public class BlockChainConfig {
     @Bean("blockChain")
-    public Map<String, List<Block>> blockchain() {
-        return new HashMap<>();
+    public List<List<Block>>blockchain() {
+        List<Block> chain = Collections.synchronizedList(new ArrayList<>());
+        List<List<Block>> blockChain = Collections.synchronizedList(new ArrayList<>());
+        blockChain.add(chain);
+        return blockChain;
     }
 }

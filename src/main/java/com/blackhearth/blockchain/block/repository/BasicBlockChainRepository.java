@@ -4,9 +4,11 @@ import com.blackhearth.blockchain.block.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,29 +23,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
 
     private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "[a-zA-Z0-9]+\\|[a-zA-Z0-9]+\\|(-?\\d+\\.?\\d*)");
     @Resource(name = "blockChain")
-    private Map<String, List<Block>> blockChain;
-
-    @PostConstruct
-    private void printBlochchain() {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(30000);
-
-                    List<Block> longest = extractLongestChain();
-                    log.info("START Blockchain dump. Longest: ({})", longest.size());
-                    log.info("Longest: {}", longest);
-                    log.info("######");
-                    blockChain.forEach((k,v) -> log.info("'{}':{}", k, v));
-                    log.info("END Blockchain dump.");
-                    log.info("######");
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
+    private List<List<Block>> blockChain;
 
     @Override
     public Optional<String> getCoinsFromAddress(String walletAddress) {
@@ -57,32 +37,34 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     }
 
     @Override
-    public List<Block> getChainToBlockHash(String hash) {
-        for (var entry : blockChain.entrySet()) {
-            List<Block> chain = entry.getValue();
-            if (chain.get(chain.size() - 1)
-                     .getHash()
-                     .equals(hash)) {
+    public synchronized List<Block> getChainToBlockHash(String hash) {
+        for (var chain : blockChain) {
+            if (!chain.isEmpty() && chain.get(chain.size() - 1)
+                                         .getHash()
+                                         .equals(hash)) {
                 return chain;
             }
         }
 
-        for (var entry : blockChain.entrySet()) {
-            for (var block : entry.getValue()) {
+        for (var chain : blockChain) {
+            for (var block : chain) {
                 if (block.getHash()
                          .equals(hash)) {
-                    blockChain.putIfAbsent(hash,
-                                           Collections.synchronizedList(new ArrayList<>(entry.getValue()
-                                                                                             .subList(0,
-                                                                                                      entry.getValue()
-                                                                                                           .indexOf(
-                                                                                                                   block)))));
-                    return blockChain.get(hash);
+                    blockChain.add(Collections.synchronizedList(new ArrayList<>(chain.subList(0,
+                                                                                              chain.indexOf(block)))));
+                    return blockChain.get(blockChain.size() - 1);
                 }
             }
         }
 
-        return new ArrayList<>();
+        for (var chain : blockChain) {
+            if (chain.isEmpty()) {
+                return chain;
+            }
+        }
+
+        blockChain.add(Collections.synchronizedList(new ArrayList<>()));
+        return blockChain.get(blockChain.size() - 1);
     }
 
     @Override
@@ -115,15 +97,9 @@ public class BasicBlockChainRepository implements BlockChainRepository {
 
     @Override
     public void addToBlockChain(Block block) {
+        log.info("adding to blockchain {}", block);
         var chain = getChainToBlockHash(block.getPreviousHash());
-        if (chain.isEmpty() && !blockChain.containsKey(block.getPreviousHash())) {
-            blockChain.putIfAbsent(block.getPreviousHash(), Collections.synchronizedList(new ArrayList<>()));
-            blockChain.get(block.getPreviousHash())
-                      .add(block);
-        } else if (!chain.contains(block)) {
-            chain.add(block);
-        }
-
+        chain.add(block);
     }
 
     @Override
@@ -137,30 +113,16 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     }
 
     @Override
-    public List<Block> extractLongestChain() {
-
-        if (blockChain.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        String hash = "";
-        int maxSize = 0;
-        for (var hashByChain : blockChain.entrySet()) {
-            int size = hashByChain.getValue()
-                                  .size();
-            if (maxSize < size) {
-                hash = hashByChain.getKey();
-                maxSize = size;
+    public synchronized List<Block> extractLongestChain() {
+        int max = 0;
+        List<Block> chainToReturn = blockChain.get(0);
+        for (var chain : blockChain) {
+            if (chain.size() > max) {
+                max = chain.size();
+                chainToReturn = chain;
             }
         }
-        for (var hashByChain : blockChain.entrySet()) {
-            int size = hashByChain.getValue()
-                                  .size();
-            if (maxSize - size > 5) {
-                blockChain.remove(hashByChain.getKey());
-            }
-        }
-        return blockChain.get(hash);
+        return chainToReturn;
     }
 
     private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {

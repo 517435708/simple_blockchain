@@ -18,13 +18,6 @@ public class Block {
     private long timeStamp;
     private int nonce;
 
-    Block(String data, String previousHash, long timeStamp) {
-        this.data = data;
-        this.previousHash = previousHash;
-        this.timeStamp = timeStamp;
-        this.hash = calculateBlockHash();
-    }
-
     @SneakyThrows
     public String calculateBlockHash() {
         String dataToHash = previousHash

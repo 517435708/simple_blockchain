@@ -67,7 +67,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
 
     @PostConstruct
     private void registerCommunicationClass() {
-        log.info("Registered communictaion class");
+        //log.info("Registered communictaion class");
         Kryo serverKryo = server.getKryo();
         serverKryo.register(CommunicationObject.class);
 
@@ -91,7 +91,7 @@ public class InterpreterBlockChainCommunication implements BlockChainCommunicati
         String port = String.valueOf(object.getSenderPort());
         String text = object.getText();
 
-        log.info("Interpreting: {} from {}:{}", text, hostAddress, port);
+        //log.info("Interpreting: {} from {}:{}", text, hostAddress, port);
         interpreter.interpretMessage(text, hostAddress, port);
     }
 

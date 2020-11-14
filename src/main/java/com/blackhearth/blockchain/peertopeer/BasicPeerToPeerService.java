@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -50,7 +51,7 @@ public class BasicPeerToPeerService implements PeerToPeerService {
     @Override
     public void sendMessageTo(String message, String address, String port) {
         try {
-            log.info("Sending msg: {} to {}:{}", message, address, port);
+            ////log.info("Sending msg: {} to {}:{}", message, address, port);
             communication.sendTo(message, address, Integer.parseInt(port));
         }catch (Exception e){
             log.error("Failed to send msg: {} to {}:{}", message, address, port);
@@ -106,6 +107,8 @@ public class BasicPeerToPeerService implements PeerToPeerService {
             miner.startMining();
             blockChainRepository.addToBlockChain(miner.lastMinedBlock());
             sendMessageToAllKnownNodes(messageFactory.generateMessages(ProtocolHeader.ADD_BLOCK).generateMessage());
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("ECHO: " + scanner.nextLine());
         }
     }
 }

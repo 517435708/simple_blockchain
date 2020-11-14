@@ -27,7 +27,7 @@ public class ChainValidator implements Validator {
 
     @Override
     public boolean isWalletValid(String hash, String publicKey) {
-        return false; //TODO
+        return true; //TODO
     }
 
     private boolean isEnoughMoney(TransactionParams params) {

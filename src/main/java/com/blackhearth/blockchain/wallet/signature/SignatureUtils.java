@@ -27,7 +27,7 @@ public class SignatureUtils {
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
             byteArrayToHexString(hexString, hash);
         } catch (NoSuchAlgorithmException e) {
-            log.error(e.getMessage());
+            //log.error(e.getMessage());
         }
         return hexString.toString();
 

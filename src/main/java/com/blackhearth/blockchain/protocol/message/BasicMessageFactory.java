@@ -6,6 +6,7 @@ import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNode;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
+import com.blackhearth.blockchain.wallet.SimpleWallet;
 import com.blackhearth.blockchain.wallet.Wallet;
 import com.blackhearth.blockchain.wallet.transaction.Transaction;
 import lombok.SneakyThrows;
@@ -167,9 +168,9 @@ public class BasicMessageFactory implements MessageFactory {
 
     private Protocol generateNotifyWalletMessage() {
         NotifyWalletMessage notifyWalletMessage = new NotifyWalletMessage();
-        notifyWalletMessage.setPublicKey(wallet.getPublicKey()
-                                               .toString());
-        notifyWalletMessage.setWalletHash(wallet.getHash());
+        var simpleWallet = new SimpleWallet(wallet);
+        notifyWalletMessage.setPublicKey(simpleWallet.getPublicKey());
+        notifyWalletMessage.setWalletHash(simpleWallet.getWalletAddress());
         return notifyWalletMessage;
     }
 

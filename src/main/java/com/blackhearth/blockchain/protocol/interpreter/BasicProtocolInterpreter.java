@@ -15,8 +15,10 @@ import com.blackhearth.blockchain.validation.Validator;
 import com.blackhearth.blockchain.wallet.WalletData;
 import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -25,7 +27,7 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.*;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     private final BlockChainRepository blockChainRepository;
@@ -36,9 +38,12 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     private final PeerToPeerService p2pService;
 
+    @Value("${wallet.new:false}")
+    private boolean newWallet;
+
     @Override
     public void interpretMessage(String message, String senderAddress, String senderPort) {
-        log.info("interpreting {}", message);
+        //log.info("interpreting {}", message);
         Optional<ProtocolHeader> optionalProtocolHeader = ProtocolHeader.getFromCode(message.substring(0, 2));
         optionalProtocolHeader.ifPresent(protocolHeader -> proceed(protocolHeader,
                                                                    message.substring(2),
@@ -113,6 +118,11 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
         String notifyNodeMessage = messageFactory.generateMessages(ProtocolHeader.NOTIFY_NODE).generateMessage();
         p2pService.sendMessageToAllKnownNodes(notifyNodeMessage);
 
+        if (newWallet) {
+            String notifyWalletMessage = messageFactory.generateMessages(NOTIFY_WALLET).generateMessage();
+            p2pService.sendMessageToAllKnownNodes(notifyWalletMessage);
+        }
+
         String askForBlock = messageFactory.generateMessages(CHAIN_REQUEST).generateMessage();
         p2pService.sendMessageToAllKnownNodes(askForBlock);
     }
@@ -163,7 +173,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     private void addBlock(String value) {
         Block block = new Gson().fromJson(value, Block.class);
         if (validator.isBlockValid(block)) {
-            log.info("BLOCK ADDED");
+            //log.info("BLOCK ADDED");
             blockChainRepository.addToBlockChain(block);
         } else {
             log.warn("BLOCK NOT ADDED");
@@ -178,7 +188,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     }
 
     private void notifyNode(String value) {
-        log.info("NotifyNode with value: {}", value);
+        //log.info("NotifyNode with value: {}", value);
         p2pRepository.saveNode(new Gson().fromJson(value, BlockChainNodeData.class));
     }
 }
