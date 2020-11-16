@@ -107,8 +107,6 @@ public class BasicPeerToPeerService implements PeerToPeerService {
             miner.startMining();
             blockChainRepository.addToBlockChain(miner.lastMinedBlock());
             sendMessageToAllKnownNodes(messageFactory.generateMessages(ProtocolHeader.ADD_BLOCK).generateMessage());
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("ECHO: " + scanner.nextLine());
         }
     }
 }
