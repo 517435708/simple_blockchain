@@ -29,7 +29,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     public Optional<String> getCoinsFromAddress(String walletAddress) {
 
         List<Block> longestChain = extractLongestChain();
-        if (walletNotRegistered(walletAddress, longestChain)) {
+        if (!walletRegistered(walletAddress, longestChain)) {
             return Optional.empty();
         }
 
@@ -125,7 +125,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
         return chainToReturn;
     }
 
-    private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
+    private boolean walletRegistered(String walletAddress, List<Block> longestChain) {
         return searchThroughChain(longestChain, false, record -> {
             if (record.contains(NOTIFY_WALLET.getCode()) && record.contains(walletAddress)) {
                 return true;
