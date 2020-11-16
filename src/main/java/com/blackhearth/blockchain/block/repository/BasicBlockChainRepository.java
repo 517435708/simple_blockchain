@@ -21,7 +21,7 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.TRANSAC
 @Slf4j
 public class BasicBlockChainRepository implements BlockChainRepository {
 
-    private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "[a-zA-Z0-9]+\\|[a-zA-Z0-9]+\\|(-?\\d+\\.?\\d*)");
+    private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "([a-zA-Z0-9]+)\\|([a-zA-Z0-9]+)\\|(-?\\d+\\.?\\d*)");
     @Resource(name = "blockChain")
     private List<List<Block>> blockChain;
 
@@ -71,21 +71,21 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     public Optional<String> getPublicKeyFromAddress(String address) {
         List<Block> longestChain = extractLongestChain();
 
-        return Optional.ofNullable(searchThroughChain(longestChain, null, row -> {
+        return searchThroughChain(longestChain, row -> {
             if (row.contains(NOTIFY_WALLET.getCode()) && row.contains(address)) {
                 String[] values = row.split("HASH:");
                 return values[0].substring(2);
             } else {
                 return null;
             }
-        }));
+        });
     }
 
     @Override
     public List<String> getWallets() {
         List<Block> longestChain = extractLongestChain();
         List<String> wallets = new ArrayList<>();
-        searchThroughChain(longestChain, null, row -> {
+        searchThroughChain(longestChain, row -> {
             if (row.contains(NOTIFY_WALLET.getCode())) {
                 String[] args = row.split("HASH:");
                 wallets.add(args[0].substring(2));
@@ -126,13 +126,13 @@ public class BasicBlockChainRepository implements BlockChainRepository {
     }
 
     private boolean walletNotRegistered(String walletAddress, List<Block> longestChain) {
-        return searchThroughChain(longestChain, false, record -> {
+        return searchThroughChain(longestChain, record -> {
             if (record.contains(NOTIFY_WALLET.getCode()) && record.contains(walletAddress)) {
                 return true;
             } else {
                 return null;
             }
-        });
+        }).isPresent();
     }
 
 
@@ -147,7 +147,8 @@ public class BasicBlockChainRepository implements BlockChainRepository {
                            .filter(string -> string.contains(address))
                            .map(transactionPattern::matcher)
                            .filter(Matcher::find)
-                           .mapToDouble(matcher -> Double.parseDouble(matcher.group(1)))
+                           .mapToDouble(matcher -> matcher.group(1)
+                                                          .equals(address) ? Double.parseDouble(matcher.group(3)) : -Double.parseDouble(matcher.group(3)))
                            .sum();
             value += Stream.of(data)
                            .filter(string -> string.contains("MINED" + address))
@@ -157,16 +158,16 @@ public class BasicBlockChainRepository implements BlockChainRepository {
         return value;
     }
 
-    private <T> T searchThroughChain(List<Block> chain, T defaultValue, Function<String, T> function) {
+    private <T> Optional<T> searchThroughChain(List<Block> chain, Function<String, T> function) {
         for (var block : chain) {
             for (var row : block.getData()
                                 .split("\\n")) {
                 Optional<T> value = Optional.ofNullable(function.apply(row));
                 if (value.isPresent()) {
-                    return value.get();
+                    return value;
                 }
             }
         }
-        return defaultValue;
+        return Optional.empty();
     }
 }
