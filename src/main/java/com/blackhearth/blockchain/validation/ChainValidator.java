@@ -2,10 +2,17 @@ package com.blackhearth.blockchain.validation;
 
 import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
+import com.blackhearth.blockchain.wallet.signature.KeysFromStringGenerator;
+import com.blackhearth.blockchain.wallet.signature.SignatureVerifier;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 
@@ -22,7 +29,7 @@ public class ChainValidator implements Validator {
 
     @Override
     public boolean isTransactionValid(TransactionParams params) {
-        return isEnoughMoney(params) && isAddressToExists(params) && isSignValid();
+        return isEnoughMoney(params) && isAddressToExists(params) && isSignValid(params);
     }
 
     @Override
@@ -39,8 +46,16 @@ public class ChainValidator implements Validator {
         return repository.getPublicKeyFromAddress(params.getAddressTo()).isPresent();
     }
 
-    private boolean isSignValid() {
-        throw new UnsupportedOperationException("Uzupełnić przez SignatureGenerator.validateSign() z brancha Błażeja po zmergowaniu");
+
+    @SneakyThrows({InvalidKeySpecException.class, NoSuchAlgorithmException.class, IOException.class})
+    private boolean isSignValid(TransactionParams params) {
+        String data = params.getAddressFrom() + "|" + params.getAddressTo() + "|" +
+                params.getTransactionMoneyAmount() + "|" + params.getTimeStamp();
+        String signature = params.getDigitalSign();
+
+        String publicKey = String.valueOf(repository.getPublicKeyFromAddress(params.getAddressFrom()));
+        PublicKey pubKey = KeysFromStringGenerator.getPublicKeyFromString(publicKey);
+        return SignatureVerifier.verifySignature(pubKey, data, signature);
     }
 
     private boolean isHashesValid(Block block) {
