@@ -97,7 +97,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
 
     @Override
     public void addToBlockChain(Block block) {
-        log.info("adding to blockchain {}", block);
+        log.debug("adding to blockchain {}", block);
         var chain = getChainToBlockHash(block.getPreviousHash());
         chain.add(block);
     }

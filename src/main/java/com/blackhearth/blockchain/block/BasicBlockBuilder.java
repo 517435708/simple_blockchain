@@ -18,7 +18,7 @@ public class BasicBlockBuilder implements BlockBuilder {
 
     @Override
     public void addDataToNextBlock(String data) {
-        log.info("ADDING DATA TO BLOCK: " + data);
+        log.debug("ADDING DATA TO BLOCK: " + data);
         if (blockInBuildingProcess == null) {
             blockInBuildingProcess = new Block();
             if (!wallet.getHash()
@@ -32,7 +32,7 @@ public class BasicBlockBuilder implements BlockBuilder {
 
     @Override
     public Block extractBlock() {
-        log.info("extracting block {}", blockInBuildingProcess);
+        log.debug("extracting block {}", blockInBuildingProcess);
         if (blockInBuildingProcess == null) {
             Block block = new Block();
             if (!wallet.getHash()

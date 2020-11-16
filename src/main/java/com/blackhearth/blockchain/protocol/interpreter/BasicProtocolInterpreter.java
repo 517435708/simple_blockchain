@@ -43,7 +43,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
 
     @Override
     public void interpretMessage(String message, String senderAddress, String senderPort) {
-        //log.info("interpreting {}", message);
+        log.debug("interpreting {}", message);
         Optional<ProtocolHeader> optionalProtocolHeader = ProtocolHeader.getFromCode(message.substring(0, 2));
         optionalProtocolHeader.ifPresent(protocolHeader -> proceed(protocolHeader,
                                                                    message.substring(2),
@@ -173,7 +173,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     private void addBlock(String value) {
         Block block = new Gson().fromJson(value, Block.class);
         if (validator.isBlockValid(block)) {
-            //log.info("BLOCK ADDED");
+            log.debug("BLOCK ADDED");
             blockChainRepository.addToBlockChain(block);
         } else {
             log.warn("BLOCK NOT ADDED");
@@ -188,7 +188,7 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
     }
 
     private void notifyNode(String value) {
-        //log.info("NotifyNode with value: {}", value);
+        log.debug("NotifyNode with value: {}", value);
         p2pRepository.saveNode(new Gson().fromJson(value, BlockChainNodeData.class));
     }
 }

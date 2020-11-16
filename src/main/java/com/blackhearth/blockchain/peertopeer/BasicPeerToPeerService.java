@@ -51,7 +51,7 @@ public class BasicPeerToPeerService implements PeerToPeerService {
     @Override
     public void sendMessageTo(String message, String address, String port) {
         try {
-            ////log.info("Sending msg: {} to {}:{}", message, address, port);
+            log.debug("Sending msg: {} to {}:{}", message, address, port);
             communication.sendTo(message, address, Integer.parseInt(port));
         }catch (Exception e){
             log.error("Failed to send msg: {} to {}:{}", message, address, port);
