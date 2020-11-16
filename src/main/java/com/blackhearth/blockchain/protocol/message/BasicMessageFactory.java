@@ -135,7 +135,7 @@ public class BasicMessageFactory implements MessageFactory {
         WalletDataResponseMessage walletDataResponseMessage = new WalletDataResponseMessage();
         walletDataResponseMessage.setAddress(address);
         walletDataResponseMessage.setAmountOfCoins(blockChainRepository.getCoinsFromAddress(address)
-                                                                       .orElse(""));
+                                                                       .orElse("0.0"));
         walletDataResponseMessage.setPublicKey(blockChainRepository.getPublicKeyFromAddress(address)
                                                                    .orElse(""));
         return walletDataResponseMessage;
