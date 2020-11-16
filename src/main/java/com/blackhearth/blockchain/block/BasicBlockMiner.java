@@ -21,6 +21,7 @@ public class BasicBlockMiner implements BlockMiner {
 
     @Override
     public void startMining() {
+        log.debug("Started mining.");
         Block builtBlock = blockBuilder.extractBlock();
         builtBlock.setPreviousHash(repository.getLastBlockHash());
         String prefixString = new String(new char[5]).replace('\0', '0');
@@ -32,5 +33,6 @@ public class BasicBlockMiner implements BlockMiner {
             builtBlock.setHash(builtBlock.calculateBlockHash());
         }
         lastMinedBlock = builtBlock;
+        log.debug("Mined: {}", builtBlock);
     }
 }

@@ -29,7 +29,10 @@ public class ChainValidator implements Validator {
 
     @Override
     public boolean isTransactionValid(TransactionParams params) {
-        return isEnoughMoney(params) && isAddressToExists(params) && isSignValid(params);
+        return isEnoughMoney(params)
+                && isAddressToExists(params)
+                && isSignValid(params)
+                && transactionNotToYourself(params);
     }
 
     @Override
@@ -56,6 +59,10 @@ public class ChainValidator implements Validator {
         String publicKey = String.valueOf(repository.getPublicKeyFromAddress(params.getAddressFrom()));
         PublicKey pubKey = KeysFromStringGenerator.getPublicKeyFromString(publicKey);
         return SignatureVerifier.verifySignature(pubKey, data, signature);
+    }
+
+    private boolean transactionNotToYourself(TransactionParams params) {
+        return !params.getAddressFrom().equals(params.getAddressTo());
     }
 
     private boolean isHashesValid(Block block) {
