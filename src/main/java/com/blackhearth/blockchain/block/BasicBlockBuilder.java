@@ -4,35 +4,35 @@ import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.wallet.Wallet;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Component
+
+@Slf4j
 @Setter
-@RequiredArgsConstructor
+@Component
 public class BasicBlockBuilder implements BlockBuilder {
 
-    private final BlockChainRepository repository;
     private Wallet wallet;
     private Block blockInBuildingProcess;
 
     @Override
     public void addDataToNextBlock(String data) {
-        if (blockInBuildingProcess != null) {
-            blockInBuildingProcess.setData(blockInBuildingProcess.getData() + "\n" + data);
-        } else {
+        log.debug("ADDING DATA TO BLOCK: " + data);
+        if (blockInBuildingProcess == null) {
             blockInBuildingProcess = new Block();
             if (!wallet.getHash()
                        .equals("")) {
                 blockInBuildingProcess.setData("MINED" + wallet.getHash());
             }
             blockInBuildingProcess.setTimeStamp(System.currentTimeMillis());
-            blockInBuildingProcess.setData(blockInBuildingProcess.getData() + "\n" + data);
-            blockInBuildingProcess.setPreviousHash(repository.getLastBlockHash());
         }
+        blockInBuildingProcess.setData(blockInBuildingProcess.getData() + "\n" + data);
     }
 
     @Override
     public Block extractBlock() {
+        log.debug("extracting block {}", blockInBuildingProcess);
         if (blockInBuildingProcess == null) {
             Block block = new Block();
             if (!wallet.getHash()
@@ -40,7 +40,6 @@ public class BasicBlockBuilder implements BlockBuilder {
                 block.setData("MINED" + wallet.getHash());
             }
             block.setTimeStamp(System.currentTimeMillis());
-            block.setPreviousHash(repository.getLastBlockHash());
             return block;
         }
         Block block = blockInBuildingProcess;

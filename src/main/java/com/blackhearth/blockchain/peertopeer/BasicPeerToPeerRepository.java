@@ -19,7 +19,7 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
 
     @Override
     public List<BlockChainNodeData> getNodes() {
-        log.info("Known hosts are: {}", knownNodes);
+        log.debug("Known hosts are: {}", knownNodes);
         return knownNodes.stream()
                 .filter(node -> !node.isDeleted())
                 .collect(Collectors.toList());
@@ -38,14 +38,14 @@ public class BasicPeerToPeerRepository implements PeerToPeerRepository {
                                       .equals(data.getIp()) && node.getPort() == data.getPort());
 
         if (!nodeExists) {
-            log.info("Saving node: {}:{}",data.getIp(), data.getPort());
+            log.debug("Saving node: {}:{}",data.getIp(), data.getPort());
             knownNodes.add(data);
         }
     }
 
     @Override
     public void deleteNode(BlockChainNodeData data) {
-        log.info("Deleting node {}:{}", data.getIp(), data.getPort());
+        log.debug("Deleting node {}:{}", data.getIp(), data.getPort());
         knownNodes
                 .stream()
                 .filter(node -> node.getIp().equals(data.getIp()) && node.getPort() == data.getPort())

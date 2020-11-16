@@ -52,7 +52,7 @@ public class BlockChainNode {
     private void runNode() throws IOException {
         p2pService.start(port);
         p2pRepository.saveNode(new BlockChainNodeData(port, IpUtils.getLocalHostLANAddress().getHostAddress()));
-        log.info("BlockChain started on TCP port {}", port);
+        log.debug("BlockChain started on TCP port {}", port);
     }
 
     @SneakyThrows
@@ -72,6 +72,7 @@ public class BlockChainNode {
                     .sum();
 
             if (IpUtils.isPortAvailable(randomServerPort)) {
+                log.info("STARTING SERVER ON PORT: " + randomServerPort);
                 return randomServerPort;
             }
 
