@@ -3,6 +3,7 @@ package com.blackhearth.blockchain.validation;
 import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ChainValidator implements Validator {
     private static final String HASH_STARTS_WITH = "00000";
     private final BlockChainRepository repository;
@@ -22,7 +24,11 @@ public class ChainValidator implements Validator {
 
     @Override
     public boolean isTransactionValid(TransactionParams params) {
-        return isEnoughMoney(params) && isAddressToExists(params) && isSignValid();
+        boolean signValid = isSignValid();
+        boolean addressToExists = isAddressToExists(params);
+        boolean enoughMoney = isEnoughMoney(params);
+        log.info("Sign valid: {}, addressExists: {}, enoungMoney: {}", signValid, addressToExists, enoughMoney);
+        return enoughMoney && addressToExists && signValid;
     }
 
     @Override
