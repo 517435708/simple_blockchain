@@ -83,7 +83,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
         searchThroughChain(longestChain, null, row -> {
             if (row.contains(NOTIFY_WALLET.getCode())) {
                 String[] args = row.split("HASH:");
-                wallets.add(args[0].substring(2));
+                wallets.add(args[1]);
             }
             return null;
         });
@@ -137,6 +137,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
             value += Stream.of(data)
                            .filter(string -> string.contains("MINED" + address))
                            .count();
+            //TODO odejmowanie zasobów
         }
 
         return value;
