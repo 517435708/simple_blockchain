@@ -21,7 +21,7 @@ import static com.blackhearth.blockchain.protocol.message.ProtocolHeader.TRANSAC
 @Slf4j
 public class BasicBlockChainRepository implements BlockChainRepository {
 
-    private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "[a-zA-Z0-9]+\\|[a-zA-Z0-9]+\\|(-?\\d+\\.?\\d*)");
+    private final Pattern transactionPattern = Pattern.compile(TRANSACTION.getCode() + "TS[a-zA-Z0-9]+\\|[a-zA-Z0-9+\\/]+\\|(-?\\d+\\.?\\d*)");
     @Resource(name = "blockChain")
     private List<List<Block>> blockChain;
 
@@ -127,6 +127,7 @@ public class BasicBlockChainRepository implements BlockChainRepository {
         for (var block : longestChain) {
             String[] data = block.getData()
                                  .split("\\n");
+
             value += Stream.of(data)
                            .filter(string -> string.contains(address))
                            .map(transactionPattern::matcher)
