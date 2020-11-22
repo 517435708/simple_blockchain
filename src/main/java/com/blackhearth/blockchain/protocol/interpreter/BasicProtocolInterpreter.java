@@ -4,7 +4,6 @@ import com.blackhearth.blockchain.block.Block;
 import com.blackhearth.blockchain.block.BlockBuilder;
 import com.blackhearth.blockchain.block.repository.BlockChainRepository;
 import com.blackhearth.blockchain.node.BlockChainNodeData;
-import com.blackhearth.blockchain.node.BlockChainNodeException;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerRepository;
 import com.blackhearth.blockchain.peertopeer.PeerToPeerService;
 import com.blackhearth.blockchain.protocol.message.MessageFactory;
@@ -14,9 +13,7 @@ import com.blackhearth.blockchain.validation.TransactionParams;
 import com.blackhearth.blockchain.validation.Validator;
 import com.blackhearth.blockchain.wallet.WalletData;
 import com.google.gson.Gson;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -163,8 +160,8 @@ public class BasicProtocolInterpreter implements ProtocolInterpreter {
         TransactionParams transactionParams = new TransactionParams(args[0],
                                                                     args[1],
                                                                     args[2],
-                                                                    args[3],
-                                                                    Long.parseLong(args[4]));
+                                                                    args[4],
+                                                                    Long.parseLong(args[3]));
         if (validator.isTransactionValid(transactionParams)) {
             blockBuilder.addDataToNextBlock(TRANSACTION.getCode() + value);
         }
