@@ -3,6 +3,7 @@ package com.blackhearth.blockchain.block.repository;
 import com.blackhearth.blockchain.block.Block;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.scanner.Scanner;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
